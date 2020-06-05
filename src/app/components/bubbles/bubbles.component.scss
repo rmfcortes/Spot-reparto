@@ -1,0 +1,56 @@
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+ul li {
+    display: inline-block;
+    clear: both;
+    padding: 10px 20px;
+    border-radius: 20px;
+    margin-bottom: 2px;
+    max-width: 70vw;
+}
+
+.him {
+    background: #99c0fc;
+    color: #066aff;
+    float: left;
+    margin-left: 0.5rem;
+}
+
+.me {
+    float: right;
+    background: #fde1ce;
+    color: var(--ion-color-primary);
+    margin-right: 0.5rem;
+}
+
+.him+.me {
+    border-bottom-right-radius: 5px;
+}
+
+.me+.me {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+.detalles {
+    margin-left: 0.3rem;
+    font-size: 9pt;
+}
+
+.el {
+    color: #0447ac;
+}
+
+.yo {
+    color: #9c5e01;
+}
+
+.estado {
+    font-size: 9pt;
+    color: #683f01;
+    float: right;
+}

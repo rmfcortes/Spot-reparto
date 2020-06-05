@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "666338399812",
+    "firebase_url": "https://revistaojo-9a8d3.firebaseio.com",
+    "project_id": "revistaojo-9a8d3",
+    "storage_bucket": "revistaojo-9a8d3.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:666338399812:android:59afe3f62257b15a6b0e11",
+        "android_client_info": {
+          "package_name": "com.spot.repartidor"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "666338399812-m79d3q5lgk0j68k8g66e5ste16fm032u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDp0RqbQQaMdJakPJxPwU_yQ2sswV7RWWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "666338399812-m79d3q5lgk0j68k8g66e5ste16fm032u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

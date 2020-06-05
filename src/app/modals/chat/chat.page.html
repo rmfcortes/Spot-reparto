@@ -1,0 +1,33 @@
+<ion-header no-border>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title slot="end">
+            <ion-label color="light">{{nombreCliente | titlecase}}</ion-label>
+        </ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <div *ngFor="let msg of messages; let last = last;" style="margin-top: 1.5rem;">
+        <app-bubbles [last]="last ? true : false" [status]="status" [msg]="msg"></app-bubbles>
+    </div>
+</ion-content>
+
+<ion-footer>
+    <ion-toolbar>
+        <ion-row class="ion-no-margin align-items-center">
+            <ion-col size="10">
+                <textarea (keyup.enter)="$event.target.blur();" placeholder="Escribe tu mensaje aquí" autosize class="message-input" maxRows="4" [(ngModel)]="newMsg"></textarea>
+            </ion-col>
+            <ion-col size="2">
+                <ion-button expand="block" fill="clear" color="primary" [disabled]="!newMsg" class="msg-btn" (click)="sendMessage()">
+                    <ion-icon name="paper-plane-sharp" slot="icon-only"></ion-icon>
+                </ion-button>
+            </ion-col>
+        </ion-row>
+    </ion-toolbar>
+</ion-footer>

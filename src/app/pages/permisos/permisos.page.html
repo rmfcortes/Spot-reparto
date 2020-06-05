@@ -1,0 +1,25 @@
+<ion-content class="bg">
+    <ion-img src="../../../assets/img/fondo_permisos.jpg" style="margin: 2.5rem 1.5rem 0 1.5rem;"></ion-img>
+    <ion-item lines="none" style="text-align: center;">
+        <ion-label color="light" class="ion-text-wrap" style="font-size: 10pt;">
+            Para sacar el máximo provecho y darte el mejor servicio, por favor otorga los siguientes permisos
+        </ion-label>
+    </ion-item>
+    <ion-card *ngIf="!fcmPermission" class="boton-margen" style="padding: 1.5rem; text-align: center;">
+        <ion-icon name="alert-circle" color="danger" style="font-size: x-large;"></ion-icon>
+        <ion-text color="danger">
+            <h6>Las notificaciones están deshabilitadas, por favor ve a 'Configuración' y habilita la recepción de notificaciones</h6>
+        </ion-text>
+    </ion-card>
+    <div class="foot">
+        <ion-button *ngIf="!fcmToken" (click)="activaFCM()" expand="block" shape="round" class="boton-margen primario" style="--background: white; margin-bottom: 1rem;">
+            Obtener ID para notificaciones
+        </ion-button>
+        <ion-button *ngIf="!gpsActivated" (click)="requestHighAccuracyLocation()" expand="block" shape="round" class="boton-margen primario" style="--background: white; margin-bottom: 1rem;">
+            Encender el GPS
+        </ion-button>
+        <ion-button *ngIf="!gpsPermission" (click)="requestLocationAuthorization()" expand="block" shape="round" class="boton-margen primario ion-text-wrap" style="--background: white">
+            Dale acceso a tu ubicación a Spot Entregas
+        </ion-button>
+    </div>
+</ion-content>

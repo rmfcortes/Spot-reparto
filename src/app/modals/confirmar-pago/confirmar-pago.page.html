@@ -1,0 +1,16 @@
+<ion-content>
+  <div class="content">
+    <div class="texto">
+      <h1>Cobra: {{total | currency:'CAD':'symbol-narrow':'1.0-2'}}</h1>
+    </div>
+  </div>
+</ion-content>
+<ion-footer (click)="entregar()">
+  <ion-toolbar style="--background: #426311; text-align: center;">
+    <h1 style="color: white;">Entregar</h1>
+  </ion-toolbar>  
+  <ion-toolbar style="--background: #426311; text-align: center;">
+    <ion-title color="light" style="margin-bottom: 2rem;"></ion-title>
+  </ion-toolbar>
+
+</ion-footer>

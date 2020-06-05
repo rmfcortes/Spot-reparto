@@ -1,0 +1,57 @@
+<ion-header>
+    <ion-toolbar color="primary">
+        <ion-buttons slot="start">
+            <ion-button (click)="regresar()">
+                <ion-icon slot="start" name="arrow-back"></ion-icon>
+            </ion-button>
+        </ion-buttons>
+        <ion-title>{{pedido.cliente.nombre}}</ion-title>
+    </ion-toolbar>
+</ion-header>
+
+<ion-content>
+    <ion-card>
+        <ion-list-header>
+            <ion-label color="primary">Contacto</ion-label>
+        </ion-list-header>
+        <ion-item *ngIf="pedido.cliente.telefono" lines="none">
+            <ion-label>{{pedido.cliente.nombre}}: {{pedido.cliente.telefono}}</ion-label>
+        </ion-item>
+    </ion-card>
+    <ion-card>
+        <ion-list-header>
+            <ion-label color="primary">Productos</ion-label>
+        </ion-list-header>
+        <ion-item *ngFor="let producto of pedido.productos let i = index" lines="full">
+            <ion-badge color="primary" slot="start">{{producto.cantidad}}</ion-badge>
+            <ion-thumbnail slot="start">
+                <img [src]="producto.url">
+            </ion-thumbnail>
+            <ion-label>
+                <h2 class="ion-text-wrap">{{producto.nombre | titlecase}}
+                    <ion-text color="primary">{{producto.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-text>
+                </h2>
+                <p>{{producto.observaciones | titlecase}}</p>
+                <div *ngFor="let item of producto.complementos">
+                    <h4>+ {{item.nombre | titlecase}}
+                        <ion-text color="primary">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-text>
+                    </h4>
+                </div>
+            </ion-label>
+        </ion-item>
+    </ion-card>
+</ion-content>
+<ion-footer>
+    <ion-toolbar style="text-align: center;" *ngIf="pedido.formaPago.forma === 'efectivo'">
+        <h1 class="primario" id="cuenta">Pago en efectivo: {{pedido.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</h1>
+    </ion-toolbar>
+    <ion-toolbar style="margin-bottom: 1rem;">
+        <div class="caja_boton" id="caja">
+            <div class="text_entregar">
+                Entregar >>>
+            </div>
+            <div class="boton" id="boton">
+            </div>
+        </div>
+    </ion-toolbar>
+</ion-footer>

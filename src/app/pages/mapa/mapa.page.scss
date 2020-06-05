@@ -1,0 +1,21 @@
+#map_canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.div_arrow {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    opacity: 0.75;
+    margin-top: 1rem;
+    margin-left: 1rem;
+}
+
+.center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: large;
+}
