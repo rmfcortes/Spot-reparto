@@ -19,7 +19,7 @@
         <ion-list-header>
             <ion-label color="primary">Recoger en:
                 <ion-text color="dark">
-                    {{item.negocio}}
+                    <strong>{{item.negocio}}</strong>
                 </ion-text>
             </ion-label>
             <ion-badge color="primary" mode="ios" style="margin-right: 1rem;">00:{{item.segundos_left | number:'1.0-0'}}</ion-badge>
@@ -37,14 +37,18 @@
         <ion-item lines="none">
             <ion-label class="ion-text-wrap" color="medium">{{item.cliente_direccion}}</ion-label>
         </ion-item>
-        <ion-item>
-            <ion-button slot="start" (click)="verMapaNuevoPedido(i)" fill="clear">
+        <ion-item lines="full">
+            <ion-button slot="end" (click)="verMapaNuevoPedido(i)">
                 Ver mapa
             </ion-button>
-            <ion-button slot="end" (click)="tomarServicio(item)" shape="round">
-                Tomar pedido
-            </ion-button>
         </ion-item>
+        <div class="caja_boton" [id]="item.idPedido">
+            <div class="text_entregar">
+                <strong>Gana $45 >>></strong>
+            </div>
+            <div class="boton" id="boton">
+            </div>
+        </div>
     </ion-card>
 
 
@@ -77,7 +81,7 @@
     </ion-card>
 
     <!-- No hay pedidos -->
-    <ion-item lines="none" style="text-align: center;" *ngIf="pedidos.length === 0 && pedidos_nuevos.length === 0">
-        <ion-label color="medium">Por el momento no tienes pedidos activos</ion-label>
+    <ion-item lines="none" style="text-align: center; margin-top: 1rem;" *ngIf="pedidos.length === 0 && pedidos_nuevos.length === 0">
+        <ion-label class="ion-text-wrap" color="medium">Por el momento no tienes pedidos activos</ion-label>
     </ion-item>
 </ion-content>

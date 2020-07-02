@@ -68,15 +68,13 @@ export class UbicacionService {
   // Compara si no es una ubicación erronea
 
   async comparaLoc(position: Geoposition) {
-    if (position.coords.accuracy > 25) {
-      return;
-    }
+    if (position.coords.accuracy > 25) return
     if (!this.lastLoc.lat || !this.lastLoc.lng) {
       this.lastLoc = {
         lat: position.coords.latitude,
         lng: position.coords.longitude
-      };
-      this.updateLocation(position);
+      }
+      this.updateLocation(position)
     } else {
       const d = await this.calculaDistancia(
         this.lastLoc.lat,
@@ -108,8 +106,8 @@ export class UbicacionService {
     const idRepartidor = this.uidService.getUid()
     const region = this.uidService.getRegion()
     console.log(region)
-    this.db.object(`ubicaciones/${idRepartidor}`).set(coords);
-    this.db.object(`repartidores_asociados_info/${region}/preview/${idRepartidor}`).update(coords)
+    this.db.object(`ubicaciones/${idRepartidor}`).set(coords)
+    if (this.uidService.getAsociado()) this.db.object(`repartidores_asociados_info/${region}/preview/${idRepartidor}`).update(coords)
   }
 
   // Auxiliares

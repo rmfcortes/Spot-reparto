@@ -29,7 +29,12 @@ export class PermisosGuard implements CanActivate {
           return false
         }
       })
-      .then(() => this.permissionService.checkPermisos())
+      .then(async () => {
+        const resp = await this.permissionService.checkPermisos()
+        if (resp) return true
+        this.router.navigate(['/permisos'])
+        return false
+      })
       .catch(err => {
         console.log(err)
         this.router.navigate(['/login'])

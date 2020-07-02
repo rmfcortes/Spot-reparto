@@ -71,5 +71,7 @@ export interface Notificacion {
     createdAt: number;
     notificado: number;
     segundos_left?: number; 
-    region?: string;         
+    region?: string;       
+    ganancia: number;
+    propina: number;  
 }

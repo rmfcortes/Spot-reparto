@@ -64,7 +64,25 @@ export class HomePage implements OnInit, OnDestroy{
     this.getPedidos()
     this.listenPermisos()
     this.isAsociado()
-    this.backgroundMode.initBackgroundMode()
+    setTimeout(() => {
+      const notification = {
+        idPedido: 'ajsdkfjaklñsdf',
+        idNegocio: 'pollo_pepe',
+        negocio: 'Pollo Pepe',
+        negocio_direccion: 'Av Siempre Viva #4523',
+        negocio_lat: '22.566566',
+        negocio_lng: '-102.2531005',
+        cliente: 'Isaías Flowers',
+        cliente_direccion: 'Independencia 16',
+        cliente_lat: '22.57158102146078',
+        cliente_lng: '-102.24589269626468',
+        notificado: '456416we6r5asd',
+        ganancia: '13',
+        propina: '19'
+      }
+      this.fcmService.newNotification(notification)
+    }, 2000);
+    // this.backgroundMode.initBackgroundMode()
   }
 
   isAsociado() {
@@ -102,14 +120,13 @@ export class HomePage implements OnInit, OnDestroy{
 
   getPedidos() {
     this.pedidosSub = this.pedidoService.getPedidos().subscribe((pedidos: Pedido[]) => {
-      console.log(pedidos)
       this.pedidos = pedidos
       if (this.pedidos && this.pedidos.length > 0) {
         this.listenNewMsg()
       } else {
         if (this.msgSub) this.msgSub.unsubscribe()
       }
-    });
+    })
   }
 
   listenPedidosNuevos() { // if is Asociado Data
@@ -121,7 +138,8 @@ export class HomePage implements OnInit, OnDestroy{
           const i = this.pedidos_nuevos.findIndex(p => p.idPedido === pedido.idPedido)
           if (i < 0) this.pedidos_nuevos.push(pedido)
         }
-        if (!this.cuentaActiva) this.cuentaRegresiva()
+        
+        // if (!this.cuentaActiva) this.cuentaRegresiva()
       }
     })
   }

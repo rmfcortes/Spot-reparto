@@ -37,12 +37,13 @@ export class BackgroundModeService {
 
   async initBackgroundMode() {
     this.platform.ready().then(() => {
-      this.backgroundMode.setDefaults({silent: true});
+      this.backgroundMode.setDefaults({silent: true})
+      this.ubicacionService.setInterval()
       this.setBackMode()
       this.setFrontMode()
       this.backgroundMode.enable()
       // this.backgroundMode.excludeFromTaskList();
-    });
+    })
   }
 
   setBackMode() {
@@ -53,8 +54,8 @@ export class BackgroundModeService {
         if (this.isAsocidado) this.listenNotificationsOnBackground()
         this.ubicacionService.clearInterval()
         this.ubicacionService.setInterval()
-      });
-    });
+      })
+    })
   }
 
   listenNotificationsOnBackground() {
@@ -75,7 +76,7 @@ export class BackgroundModeService {
         this.ubicacionService.clearInterval()
         this.ubicacionService.setInterval()
       })
-    });
+    })
   }
 
   stopListenNotificationsBack() {

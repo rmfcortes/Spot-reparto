@@ -20,7 +20,7 @@ export class RegionService {
 
     checkRegion(): Promise<boolean> {
       return new Promise(async (resolve, reject) => {
-        let region;
+        let region
         region = this.uidService.getRegion()
         if (region) return resolve(true)
         region = await this.getRegion()
@@ -38,13 +38,12 @@ export class RegionService {
           this.uidService.setRegion(region)
           resolve(true)
         } else resolve(false)
-      });
+      })
     }
   
     getRegionDB(): Promise<boolean> {
       return new Promise((resolve, reject) => {
         const uid = this.uidService.getUid()
-        console.log(uid)
         const regSub = this.db.object(`regiones_repartidores_asociados/${uid}`).valueChanges().subscribe((region: string) => {
           regSub.unsubscribe()
 

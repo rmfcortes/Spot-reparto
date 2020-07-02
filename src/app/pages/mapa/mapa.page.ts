@@ -58,7 +58,7 @@ export class MapaPage implements OnInit {
     Environment.setEnv({
       'API_KEY_FOR_BROWSER_RELEASE': environment.mapsApiKey,
       'API_KEY_FOR_BROWSER_DEBUG': environment.mapsApiKey
-    });
+    })
 
     let mapOptions: GoogleMapOptions = {
       camera: {
@@ -90,7 +90,7 @@ export class MapaPage implements OnInit {
         lat: this.cliente.direccion.lat,
         lng: this.cliente.direccion.lng
       }
-    });
+    })
     // marker.on(GoogleMapsEvent.MARKER_CLICK).subscribe(() => {
     //   alert('clicked');
     // });

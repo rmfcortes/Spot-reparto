@@ -17,27 +17,35 @@ export class UidService {
 
   setUid(uid) {
     this.uid = uid;
-    this.usuario.next(uid);
+    this.usuario.next(uid)
   }
 
   getUid() {
-    return this.uid;
+    return this.uid
   }
 
   setRegion(region) {
-    this.region = region;
+    this.region = region
   }
 
   getRegion() {
-    return this.region;
+    return this.region
   }
 
   setNombre(nombre) {
-    this.nombre = nombre;
+    this.nombre = nombre
   }
 
   getNombre() {
-    return this.nombre;
+    return this.nombre
+  }
+
+  setAsociado(asociado: boolean) {
+    this.asociado = asociado
+  }
+
+  getAsociado() {
+    return this.asociado
   }
 
 }

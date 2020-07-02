@@ -33,7 +33,6 @@ export class PedidoPage implements OnInit, AfterViewInit {
     let cuenta
     if (this.pedido.formaPago.forma === 'efectivo') {
       cuenta = document.getElementById('cuenta')
-      console.log(cuenta);
       this.animationService.pulse(cuenta)
     }
     let width_caja = 0

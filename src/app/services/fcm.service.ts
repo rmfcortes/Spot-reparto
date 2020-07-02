@@ -79,16 +79,18 @@ export class FcmService {
       negocio_direccion: notification.negocio_direccion,
       negocio_lat: parseInt(notification.negocio_lat, 10),
       negocio_lng: parseInt(notification.negocio_lng, 10),
-      notificado: parseInt(notification.notificado, 10)
+      notificado: parseInt(notification.notificado, 10),
+      ganancia: parseInt(notification.ganancia, 10),
+      propina: parseInt(notification.propina, 10)
     }
     this.pedido_nuevo.next(nuevo_pedido)
-    this.clearNotifications(nuevo_pedido.idPedido)
-    this.audio.play('alerta')
+    // this.clearNotifications(nuevo_pedido.idPedido)
+    // this.audio.play('alerta')
   }
 
   clearNotifications(idPedido: string) {
     const uid = this.uidService.getUid()
-    this.db.object(`notifications/${uid}${idPedido}`).remove()
+    this.db.object(`notifications/${uid}/${idPedido}`).remove()
   }
 
   silenciar() {

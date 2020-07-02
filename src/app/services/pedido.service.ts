@@ -23,11 +23,20 @@ export class PedidoService {
       const uid = this.uidService.getUid()
       const region = this.uidService.getRegion()
       console.log(region)
+      if (!region) {
+        this.uidService.setAsociado(false)
+        return reject(false)
+      }
       const asocSub = this.db.object(`repartidores_asociados_info/${region}/preview/${uid}`).valueChanges()
       .subscribe(data => {
         asocSub.unsubscribe()
-        if (data) resolve(true)
-        else reject(false)
+        if (data) {
+          this.uidService.setAsociado(true)
+          resolve(true)
+        } else {
+          this.uidService.setAsociado(false)
+          reject(false)
+        }  
       })
     });
   }
