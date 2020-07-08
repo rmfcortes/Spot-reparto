@@ -20,6 +20,7 @@ import { UnreadMsg } from 'src/app/interfaces/chat';
 import { CommonService } from 'src/app/services/common.service';
 import { FcmService } from 'src/app/services/fcm.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { AnimationService } from 'src/app/services/animation.service';
 
 
 
@@ -42,6 +43,10 @@ export class HomePage implements OnInit, OnDestroy{
   pedidos_nuevos: Notificacion[] = []
   pedidos_nuevosSub: Subscription
   cuentaActiva = false
+  caja: HTMLElement
+
+  esAsociado = false
+  activo = false
 
   constructor(
     private router: Router,
@@ -49,6 +54,7 @@ export class HomePage implements OnInit, OnDestroy{
     private modalCtrl: ModalController,
     private backgroundMode: BackgroundModeService,
     private permisosService: PermissionsService,
+    private animationService: AnimationService,
     private ubicacionService: UbicacionService,
     private commonService: CommonService,
     private pedidoService: PedidoService,
@@ -80,14 +86,32 @@ export class HomePage implements OnInit, OnDestroy{
         ganancia: '13',
         propina: '19'
       }
-      this.fcmService.newNotification(notification)
-    }, 2000);
+      this.fcmService.newNotification(notification)      
+      const notification2 = {
+        idPedido: 'segundo_pedido',
+        idNegocio: 'pollo_pepe',
+        negocio: 'Okuma',
+        negocio_direccion: 'Av Siempre Viva #4523',
+        negocio_lat: '22.566566',
+        negocio_lng: '-102.2531005',
+        cliente: 'Isaías Flowers',
+        cliente_direccion: 'Independencia 16',
+        cliente_lat: '22.57158102146078',
+        cliente_lng: '-102.24589269626468',
+        notificado: '456416we6r5asd',
+        ganancia: '50',
+        propina: '20'
+      }
+      this.fcmService.newNotification(notification2)
+    }, 2000)
     // this.backgroundMode.initBackgroundMode()
   }
 
   isAsociado() {
     this.pedidoService.isAsociado()
-    .then(() => {
+    .then(resp => {
+      this.activo = resp
+      this.esAsociado = true
       this.backgroundMode.setAsociado(true)
       this.fcmService.requestToken()
       this.fcmService.initAudio()
@@ -105,27 +129,21 @@ export class HomePage implements OnInit, OnDestroy{
     })
   }
 
-  listenNewMsg() {
-    this.msgSub = this.chatService.listenMsg().subscribe((unReadmsg: UnreadMsg[]) => {
-      this.pedidos.forEach(p => {
-        const i = unReadmsg.findIndex(u => u.idPedido === p.id);
-        if (i >= 0) {
-          p.unRead = unReadmsg[i].cantidad;
-        } else {
-          p.unRead = 0;
-        }
-      });
-    });
-  }
-
   getPedidos() {
     this.pedidosSub = this.pedidoService.getPedidos().subscribe((pedidos: Pedido[]) => {
       this.pedidos = pedidos
-      if (this.pedidos && this.pedidos.length > 0) {
-        this.listenNewMsg()
-      } else {
-        if (this.msgSub) this.msgSub.unsubscribe()
-      }
+      if (this.pedidos && this.pedidos.length > 0) this.listenNewMsg()
+      else if (this.msgSub) this.msgSub.unsubscribe()
+    })
+  }
+
+  listenNewMsg() {
+    this.msgSub = this.chatService.listenMsg().subscribe((unReadmsg: UnreadMsg[]) => {
+      this.pedidos.forEach(p => {
+        const i = unReadmsg.findIndex(u => u.idPedido === p.id)
+        if (i >= 0) p.unRead = unReadmsg[i].cantidad
+        else p.unRead = 0
+      })
     })
   }
 
@@ -138,7 +156,13 @@ export class HomePage implements OnInit, OnDestroy{
           const i = this.pedidos_nuevos.findIndex(p => p.idPedido === pedido.idPedido)
           if (i < 0) this.pedidos_nuevos.push(pedido)
         }
-        
+        setTimeout(() => {
+          if (!this.caja) this.caja = document.getElementById('caja')
+          const boton = document.getElementById(pedido.idPedido)
+          const width_caja = this.caja.clientWidth - 55
+          this.animationService.arrastraArray(boton, width_caja, pedido.idPedido)
+          .then(() => this.tomarServicio(pedido))
+        }, 500)
         // if (!this.cuentaActiva) this.cuentaRegresiva()
       }
     })
@@ -146,28 +170,46 @@ export class HomePage implements OnInit, OnDestroy{
 
   // Acciones
 
+  toogleActive(value: boolean) {
+    if (this.pedidos.length > 0 && !value) {
+      this.commonService.presentAlert('', 'Antes de pasar a Modo Inactivo, por favor completa todos tus servicios')
+      return
+    }
+    if (value) {
+      this.listenPedidosNuevos()
+      this.listenPermisos()
+      this.getPedidos()
+    } else {
+      this.cancelListeners()
+      this.fcmService.cleanPedidoSub()
+      this.pedidos_nuevos.forEach(p => this.animationService.stopArrastraArray(p.idPedido))
+      this.pedidos_nuevos = []
+    }
+    this.pedidoService.setActivo(value)
+  }
+
   llamar(numero) {
     this.callNumber.callNumber(numero, true)
       .then(res => console.log('Launched dialer!', res))
-      .catch(err => console.error(err));
+      .catch(err => console.error(err))
   }
 
   async verPedido(pedido) {
     const modal = await this.modalCtrl.create({
       component: PedidoPage,
       componentProps: {pedido}
-    });
+    })
 
-    return await modal.present();
+    return await modal.present()
   }
 
   async verChat(idCliente: string, idPedido: string, nombreCliente: string) {
     const modal = await this.modalCtrl.create({
       component: ChatPage,
       componentProps: { idCliente, idPedido, nombreCliente }
-    });
+    })
 
-    return await modal.present();
+    return await modal.present()
   }
 
   verMapaNuevoPedido(i) {
@@ -191,7 +233,8 @@ export class HomePage implements OnInit, OnDestroy{
   }
 
   tomarServicio(pedido: Notificacion) { // solo para Asociados
-    this.pedidoService.tomarPedido(pedido)
+    this.animationService.stopArrastraArray(pedido.idPedido)
+    // this.pedidoService.tomarPedido(pedido)
     this.pedidos_nuevos = this.pedidos_nuevos.filter(p => p.idPedido !== pedido.idPedido)
   }
   
@@ -213,7 +256,7 @@ export class HomePage implements OnInit, OnDestroy{
         }
       }
       this.cuentaRegresiva()
-    }, 1000);
+    }, 1000)
   }
 
   // Salida

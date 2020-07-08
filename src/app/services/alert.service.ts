@@ -131,11 +131,11 @@ export class AlertService {
     this.loader = await this.loadingCtrl.create({
      spinner: 'crescent'
     });
-    return await this.loader.present();
+    return await this.loader.present()
   }
 
   dismissLoading() {
-    this.loader.dismiss();
+    this.loader.dismiss()
   }
 
 }

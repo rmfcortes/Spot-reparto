@@ -4,6 +4,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { UidService } from './uid.service';
 
 import { Pedido, Notificacion } from '../interfaces/pedido';
+import { RepaAsociadoPreview } from '../interfaces/repa_asociado.interface';
 
 
 @Injectable({
@@ -22,17 +23,16 @@ export class PedidoService {
     return new Promise((resolve, reject) => {
       const uid = this.uidService.getUid()
       const region = this.uidService.getRegion()
-      console.log(region)
       if (!region) {
         this.uidService.setAsociado(false)
         return reject(false)
       }
       const asocSub = this.db.object(`repartidores_asociados_info/${region}/preview/${uid}`).valueChanges()
-      .subscribe(data => {
+      .subscribe((data: RepaAsociadoPreview) => {
         asocSub.unsubscribe()
         if (data) {
           this.uidService.setAsociado(true)
-          resolve(true)
+          resolve(data.activo)
         } else {
           this.uidService.setAsociado(false)
           reject(false)
@@ -59,6 +59,12 @@ export class PedidoService {
     this.db.object(`chat/${idRepartidor}/todos/${pedido.id}`).remove()
     this.db.object(`chat/${idRepartidor}/unread/${pedido.id}`).remove()
     this.db.object(`chat/${idRepartidor}/status/${pedido.id}`).remove()
+  }
+
+  setActivo(value: boolean) {
+    const region = this.uidService.getRegion()
+    const uid = this.uidService.getUid()
+    this.db.object(`repartidores_asociados_info/${region}/preview/${uid}/activo`).set(value)
   }
 
 }

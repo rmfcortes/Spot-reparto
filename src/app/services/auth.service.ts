@@ -42,8 +42,8 @@ export class AuthService {
       const uid = await this.commonService.getVariableFromStorage('uid')
       if (uid) {
         const nombre = await this.commonService.getVariableFromStorage('nombre')
-        this.uidService.setUid(uid);
-        this.uidService.setNombre(nombre);
+        this.uidService.setUid(uid)
+        this.uidService.setNombre(nombre)
         resolve(true)
       } else resolve(false)
     });
@@ -52,10 +52,10 @@ export class AuthService {
   async revisaFireAuth(): Promise<boolean> {
     return new Promise((resolve, reject) => {
       const authSub = this.authFirebase.authState.subscribe(async (user) => {
-        authSub.unsubscribe();
+        authSub.unsubscribe()
         if (user) {
-          await this.setUser(user.uid, user.displayName);
-          resolve(true);
+          await this.setUser(user.uid, user.displayName)
+          resolve(true)
         } else {
           resolve(false)
         }
@@ -75,7 +75,7 @@ export class AuthService {
         this.setUser(resp.user.uid, resp.user.displayName)
         resolve(true)
       } catch (error) {
-        reject(error);
+        reject(error)
       }
     });
   }

@@ -1,11 +1,16 @@
-<ion-header *ngIf="!isModal">
-    <ion-toolbar color="primary">
+<ion-header *ngIf="!isModal" class="ion-no-border fondo-header">
+    <ion-toolbar class="fondo-header">
+        <ion-buttons slot="start" *ngIf="esAsociado">
+            <ion-button (click)="cerrarSesion()">
+                <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+            </ion-button>
+        </ion-buttons>
         <ion-title>
             {{nombre | titlecase}}
         </ion-title>
-        <ion-buttons slot="end">
-            <ion-button (click)="cerrarSesion()">
-                <ion-icon slot="icon-only" name="log-out"></ion-icon>
+        <ion-buttons slot="end" *ngIf="esAsociado">
+            <ion-button>
+                <ion-toggle color="success" [(ngModel)]="activo" (ionChange)="toogleActive($event.detail.checked)"></ion-toggle>
             </ion-button>
         </ion-buttons>
     </ion-toolbar>
@@ -42,11 +47,11 @@
                 Ver mapa
             </ion-button>
         </ion-item>
-        <div class="caja_boton" [id]="item.idPedido">
+        <div class="caja_boton" id="caja">
             <div class="text_entregar">
-                <strong>Gana $45 >>></strong>
+                <strong style="margin-right: 0.75rem;">Gana {{item?.propina + item.ganancia | currency:'CAD':'symbol-narrow':'1.0-2'}}</strong>>>
             </div>
-            <div class="boton" id="boton">
+            <div class="boton" [id]="item.idPedido">
             </div>
         </div>
     </ion-card>
@@ -81,7 +86,12 @@
     </ion-card>
 
     <!-- No hay pedidos -->
-    <ion-item lines="none" style="text-align: center; margin-top: 1rem;" *ngIf="pedidos.length === 0 && pedidos_nuevos.length === 0">
+    <ion-item lines="none" style="text-align: center; margin-top: 1rem;" *ngIf="pedidos.length === 0 && pedidos_nuevos.length === 0 && activo">
         <ion-label class="ion-text-wrap" color="medium">Por el momento no tienes pedidos activos</ion-label>
+    </ion-item>    
+
+    <!-- Inactivo -->
+    <ion-item lines="none" style="text-align: center; margin-top: 1rem;" *ngIf="!activo">
+        <ion-label class="ion-text-wrap">Entra en Modo Activo para empezar a recibir pedidos</ion-label>
     </ion-item>
 </ion-content>

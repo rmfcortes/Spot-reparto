@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Platform, ToastController } from '@ionic/angular';
+import { Platform, ToastController, AlertController } from '@ionic/angular';
 
 import { Storage } from '@ionic/storage';
 import { AngularFireDatabase } from '@angular/fire/database';
@@ -19,6 +19,7 @@ export class CommonService {
     private storage: Storage,
     private platform: Platform,
     private db: AngularFireDatabase,
+    private alertController: AlertController,
     private toastController: ToastController,
     private uidService: UidService,
   ) { }
@@ -28,33 +29,34 @@ export class CommonService {
       if ( this.platform.is('cordova') ) {
         // Celular
         this.storage.ready().then(async () => {
-          const value = this.storage.get(variable);
+          const value = this.storage.get(variable)
           resolve(value)
-        });
+        })
       } else {
         // Escritorio
         const value = localStorage.getItem(variable)
         resolve(value)
       }
-    });
+    })
   }
 
   setVariableToStorage(name: string, value: string) {
     return new Promise (async (resolve, reject) => {
       if (this.platform.is ('cordova')) {
-        this.storage.set(name, value);
+        this.storage.set(name, value)
+        resolve()
       } else {
-        localStorage.setItem(name, value);
-        resolve();
+        localStorage.setItem(name, value)
+        resolve()
       }
     });
   }
 
   removeFromStorage(name: string) {
     if ( this.platform.is('cordova') ) {
-      this.storage.remove(name);
+      this.storage.remove(name)
     } else {
-      localStorage.removeItem(name);
+      localStorage.removeItem(name)
     }
   }
 
@@ -86,8 +88,27 @@ export class CommonService {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 2000
-    });
-    toast.present();
+    })
+    toast.present()
+  }
+
+  async presentAlert(titulo, msn) {
+    const alert = await this.alertController.create({
+      header: titulo,
+      message: msn,
+      buttons: [
+        {
+          text: 'Ok',
+          role: 'cancel',
+          cssClass: 'secondary',
+          handler: (blah) => {
+            console.log('Confirm Cancel: blah');
+          }
+        }
+      ]
+    })
+
+    await alert.present()
   }
 
 }

@@ -88,6 +88,10 @@ export class FcmService {
     // this.audio.play('alerta')
   }
 
+  cleanPedidoSub() {
+    this.pedido_nuevo.next(null)
+  }
+
   clearNotifications(idPedido: string) {
     const uid = this.uidService.getUid()
     this.db.object(`notifications/${uid}/${idPedido}`).remove()

@@ -76,6 +76,7 @@ export class AnimationService {
   stopArrastraArray(gestureName: string) {
     const i = this.arrastraArrayGesture.findIndex(g => g.idPedido === gestureName)
     this.arrastraArrayGesture[i].gesture.destroy()
+    this.arrastraArrayGesture = this.arrastraArrayGesture.filter(a => a.idPedido !== gestureName)
   }
 
   pulse(el: HTMLElement) {
