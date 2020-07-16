@@ -1,8 +1,8 @@
-<ion-header>
-    <ion-toolbar color="primary">
+<ion-header class="ion-no-border">
+    <ion-toolbar class="fondo-content">
         <ion-buttons slot="start">
             <ion-button (click)="regresar()">
-                <ion-icon slot="start" name="arrow-back"></ion-icon>
+                <ion-icon slot="start" name="chevron-back"></ion-icon>
             </ion-button>
         </ion-buttons>
         <ion-title>{{pedido.cliente.nombre}}</ion-title>
@@ -10,14 +10,16 @@
 </ion-header>
 
 <ion-content>
+    <!-- Datos cliente -->
     <ion-card>
         <ion-list-header>
-            <ion-label color="primary">Contacto</ion-label>
+            <ion-label color="primary">Cliente</ion-label>
         </ion-list-header>
         <ion-item *ngIf="pedido.cliente.telefono" lines="none">
             <ion-label>{{pedido.cliente.nombre}}: {{pedido.cliente.telefono}}</ion-label>
         </ion-item>
     </ion-card>
+    <!-- Lista productos -->
     <ion-card>
         <ion-list-header>
             <ion-label color="primary">Productos</ion-label>
@@ -33,15 +35,28 @@
                 </h2>
                 <p>{{producto.observaciones | titlecase}}</p>
                 <div *ngFor="let item of producto.complementos">
-                    <h4>+ {{item.nombre | titlecase}}
-                        <ion-text color="primary">{{item.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-text>
-                    </h4>
+                    <h4>+ {{item.titulo | titlecase}}</h4>
+                    <p style="color: var(--ion-color-primary); margin-left: 0.5rem;" *ngFor="let com of item.complementos">{{com.nombre}}: {{com.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</p>
                 </div>
             </ion-label>
         </ion-item>
     </ion-card>
+    <!-- Detalles entrega -->
+    <ion-card *ngIf="pedido.recolectado">
+        <ion-list-header>
+            <ion-label color="primary">Entregar en:</ion-label>
+        </ion-list-header>
+        <ion-item lines="none">
+            <ion-label>{{pedido.cliente.direccion.direccion}}</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+            <ion-button slot="end" (click)="verMapa()" shape="round">
+                Ver mapa
+            </ion-button>
+        </ion-item>
+    </ion-card>
 </ion-content>
-<ion-footer>
+<ion-footer *ngIf="pedido.recolectado || !esAsociado">
     <ion-toolbar style="text-align: center;" *ngIf="pedido.formaPago.forma === 'efectivo'">
         <h1 class="primario" id="cuenta">Pago en efectivo: {{pedido.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</h1>
     </ion-toolbar>
@@ -51,6 +66,17 @@
                 Entregar >>>
             </div>
             <div class="boton" id="boton">
+            </div>
+        </div>
+    </ion-toolbar>
+</ion-footer>
+<ion-footer class="ion-no-border">
+    <ion-toolbar style="margin-bottom: 1rem;" class="">
+        <div class="caja_boton" id="caja_rec">
+            <div class="text_entregar">
+                Tengo los productos >>>
+            </div>
+            <div class="boton" id="rec">
             </div>
         </div>
     </ion-toolbar>

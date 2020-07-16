@@ -52,6 +52,11 @@ export class PedidoService {
     this.db.object(`pendientes_aceptacion/${idRepartidor}/${pedido.idPedido}`).set(pedido)
   }
 
+  async tengoProductos(pedido: Pedido) {
+    const idRepartidor = this.uidService.getUid()
+    await this.db.object(`asignados/${idRepartidor}/${pedido.id}`).update(pedido)
+  }
+
   async finalizarPedido(pedido: Pedido) {
     const idRepartidor = this.uidService.getUid()
     await this.db.object(`asignados/${idRepartidor}/${pedido.id}/entregado`).set(Date.now())

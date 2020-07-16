@@ -1,12 +1,67 @@
 export interface Pedido {
-    aceptado: boolean;
+    aceptado: any;
+    avances: Avance[];
+    calificacion?: Calificacion;
     cliente: Cliente;
-    id: string;
-    productos: Producto[];
-    repartidor: Repartidor;
-    total: number;
+    createdAt: number;
+    comision: number;
+    entrega: string;
+    entregado?: number;
+    envio: number;
+    id?: string;
+    negocio: Negocio;
     formaPago: FormaPago;
-    unRead?: number;
+    productos: Producto[];
+    propina: number;
+    repartidor?: RepartidorPedido;
+    total: number;
+    last_notification?: number;
+    last_notificado?: string;
+    last_solicitud?: number;
+    cancelado_by_negocio?: number;
+    razon_cancelacion?: string;
+    repartidor_solicitado: boolean;
+    recolectado?: boolean;
+    unRead: number;
+}
+
+export interface Avance {
+    fecha: number;
+    concepto: string;
+}
+
+export interface Calificacion {
+    negocio: CalificacionDetalles;
+    repartidor: CalificacionDetalles;
+}
+
+export interface CalificacionDetalles {
+    comentarios: string
+    puntos: number
+    idPedido: string
+    fecha: number
+}
+
+export interface Negocio {
+    categoria: string;
+    direccion: Direccion;
+    envio: number;
+    idNegocio: string;
+    logo: string;
+    nombreNegocio: string;
+    telefono: string;
+    repartidores_propios: boolean;
+}
+
+export interface RepartidorPedido {
+    nombre: string;
+    telefono: string;
+    foto: string;
+    lat?: number;
+    lng?: number;
+    id: string;
+    externo: boolean;
+    ganancia?: number;
 }
 
 export interface FormaPago {
@@ -32,7 +87,7 @@ export interface Direccion {
 export interface Producto{
     cantidad: number;
     codigo?: string;
-    complementos: Complemento[];
+    complementos?: ListaComplementosElegidos[];
     descripcion: string;
     id: string;
     nombre: string;
@@ -45,9 +100,14 @@ export interface Producto{
     variables: boolean;
 }
 
-export interface Complemento {
+export interface ListaComplementosElegidos {
+    titulo: string;
+    complementos: ProductoComplemento[];
+}
+
+export interface ProductoComplemento {
     nombre: string;
-    precio: number;
+    precio?: any;
 }
 
 export interface Repartidor {

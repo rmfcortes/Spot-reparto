@@ -31,7 +31,7 @@ export class FcmService {
   ) {  }
 
   initAudio() {
-    this.audio.preloadSimple('alerta', 'assets/sound/loving-you.mp3')
+    this.audio.preloadSimple('alerta', 'assets/sounds/loving-you.mp3')
   }
 
   requestToken() {
@@ -57,11 +57,9 @@ export class FcmService {
   escuchaMensajes() {
     this.notifcationSub = this.fcm.onNotification().subscribe((msg: NotificationData) => {
       this.ngZone.run(() => {
-        if (msg.idPedido) {
-          this.newNotification(msg)
-        }
+        if (msg.idPedido) this.newNotification(msg)
         this.fcm.clearAllNotifications()
-        this.commonService.presentToast(msg)
+        this.commonService.presentToast(msg.body)
       })
     })
   }
@@ -84,8 +82,8 @@ export class FcmService {
       propina: parseInt(notification.propina, 10)
     }
     this.pedido_nuevo.next(nuevo_pedido)
-    // this.clearNotifications(nuevo_pedido.idPedido)
-    // this.audio.play('alerta')
+    this.clearNotifications(nuevo_pedido.idPedido)
+    this.audio.play('alerta')
   }
 
   cleanPedidoSub() {

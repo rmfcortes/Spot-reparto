@@ -11,7 +11,6 @@ export class AnimationService {
 
   pulseAnim: Animation
   arrastraGesture: Gesture
-  arrastraArrayGesture: Gestures[] = []
 
   constructor(
     private gestureCtrl: GestureController,
@@ -42,43 +41,6 @@ export class AnimationService {
     this.arrastraGesture.destroy()
   }
 
-  arrastraArray(boton: HTMLElement, width_caja: number, gestureName: string) {
-    return new Promise((resolve, reject) => { 
-      let currentX = 0
-      const gest = this.gestureCtrl.create({
-        el: boton,
-        gestureName,
-        onMove: ev => {
-          if (ev.deltaX > 0 && ev.deltaX < width_caja && width_caja) {
-            boton.style.transform = `translateX(${ev.deltaX}px)`
-            currentX = ev.currentX
-          }
-        },
-        onEnd: ev => {
-          if (currentX - 55 >= (width_caja + 55) * .8) resolve()
-          boton.style.transform = `translateX(${0}px)`
-        }
-      })
-      gest.enable(true)
-      const gesture_arr: Gestures = {
-        idPedido: gestureName,
-        gesture: gest
-      }
-      if (this.arrastraArrayGesture.length === 0) {
-        this.arrastraArrayGesture.push(gesture_arr)
-      } else {
-        const i = this.arrastraArrayGesture.findIndex(g => g.idPedido === gestureName)
-        if (i < 0) this.arrastraArrayGesture.push(gesture_arr)
-      }
-    })
-  }
-
-  stopArrastraArray(gestureName: string) {
-    const i = this.arrastraArrayGesture.findIndex(g => g.idPedido === gestureName)
-    this.arrastraArrayGesture[i].gesture.destroy()
-    this.arrastraArrayGesture = this.arrastraArrayGesture.filter(a => a.idPedido !== gestureName)
-  }
-
   pulse(el: HTMLElement) {
     this.pulseAnim = createAnimation()
     .addElement(el)
@@ -94,10 +56,8 @@ export class AnimationService {
 
   stopPulse() {
     this.pulseAnim.stop()
+    this.pulseAnim.destroy()
   }
-
-
-
 
 }
 

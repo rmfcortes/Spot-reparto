@@ -12,15 +12,14 @@ import { BackgroundModeService } from 'src/app/services/background.service';
 import { PermissionsService } from 'src/app/services/permissions.service';
 import { UbicacionService } from 'src/app/services/ubicacion.service';
 import { PedidoService } from 'src/app/services/pedido.service';
+import { CommonService } from 'src/app/services/common.service';
 import { ChatService } from 'src/app/services/chat.service';
+import { AuthService } from 'src/app/services/auth.service';
+import { FcmService } from 'src/app/services/fcm.service';
 import { UidService } from 'src/app/services/uid.service';
 
 import { Pedido, Cliente, Notificacion, Direccion } from 'src/app/interfaces/pedido';
 import { UnreadMsg } from 'src/app/interfaces/chat';
-import { CommonService } from 'src/app/services/common.service';
-import { FcmService } from 'src/app/services/fcm.service';
-import { AuthService } from 'src/app/services/auth.service';
-import { AnimationService } from 'src/app/services/animation.service';
 
 
 
@@ -38,12 +37,9 @@ export class HomePage implements OnInit, OnDestroy{
   pedidosSub: Subscription
   permisosSub: Subscription
 
-  isModal = false
-
   pedidos_nuevos: Notificacion[] = []
   pedidos_nuevosSub: Subscription
   cuentaActiva = false
-  caja: HTMLElement
 
   esAsociado = false
   activo = false
@@ -54,7 +50,6 @@ export class HomePage implements OnInit, OnDestroy{
     private modalCtrl: ModalController,
     private backgroundMode: BackgroundModeService,
     private permisosService: PermissionsService,
-    private animationService: AnimationService,
     private ubicacionService: UbicacionService,
     private commonService: CommonService,
     private pedidoService: PedidoService,
@@ -70,41 +65,7 @@ export class HomePage implements OnInit, OnDestroy{
     this.getPedidos()
     this.listenPermisos()
     this.isAsociado()
-    setTimeout(() => {
-      const notification = {
-        idPedido: 'ajsdkfjaklñsdf',
-        idNegocio: 'pollo_pepe',
-        negocio: 'Pollo Pepe',
-        negocio_direccion: 'Av Siempre Viva #4523',
-        negocio_lat: '22.566566',
-        negocio_lng: '-102.2531005',
-        cliente: 'Isaías Flowers',
-        cliente_direccion: 'Independencia 16',
-        cliente_lat: '22.57158102146078',
-        cliente_lng: '-102.24589269626468',
-        notificado: '456416we6r5asd',
-        ganancia: '13',
-        propina: '19'
-      }
-      this.fcmService.newNotification(notification)      
-      const notification2 = {
-        idPedido: 'segundo_pedido',
-        idNegocio: 'pollo_pepe',
-        negocio: 'Okuma',
-        negocio_direccion: 'Av Siempre Viva #4523',
-        negocio_lat: '22.566566',
-        negocio_lng: '-102.2531005',
-        cliente: 'Isaías Flowers',
-        cliente_direccion: 'Independencia 16',
-        cliente_lat: '22.57158102146078',
-        cliente_lng: '-102.24589269626468',
-        notificado: '456416we6r5asd',
-        ganancia: '50',
-        propina: '20'
-      }
-      this.fcmService.newNotification(notification2)
-    }, 2000)
-    // this.backgroundMode.initBackgroundMode()
+    this.backgroundMode.initBackgroundMode()
   }
 
   isAsociado() {
@@ -156,14 +117,7 @@ export class HomePage implements OnInit, OnDestroy{
           const i = this.pedidos_nuevos.findIndex(p => p.idPedido === pedido.idPedido)
           if (i < 0) this.pedidos_nuevos.push(pedido)
         }
-        setTimeout(() => {
-          if (!this.caja) this.caja = document.getElementById('caja')
-          const boton = document.getElementById(pedido.idPedido)
-          const width_caja = this.caja.clientWidth - 55
-          this.animationService.arrastraArray(boton, width_caja, pedido.idPedido)
-          .then(() => this.tomarServicio(pedido))
-        }, 500)
-        // if (!this.cuentaActiva) this.cuentaRegresiva()
+        if (!this.cuentaActiva) this.cuentaRegresiva()
       }
     })
   }
@@ -173,6 +127,7 @@ export class HomePage implements OnInit, OnDestroy{
   toogleActive(value: boolean) {
     if (this.pedidos.length > 0 && !value) {
       this.commonService.presentAlert('', 'Antes de pasar a Modo Inactivo, por favor completa todos tus servicios')
+      .then(() => this.activo = true)
       return
     }
     if (value) {
@@ -182,7 +137,6 @@ export class HomePage implements OnInit, OnDestroy{
     } else {
       this.cancelListeners()
       this.fcmService.cleanPedidoSub()
-      this.pedidos_nuevos.forEach(p => this.animationService.stopArrastraArray(p.idPedido))
       this.pedidos_nuevos = []
     }
     this.pedidoService.setActivo(value)
@@ -197,7 +151,7 @@ export class HomePage implements OnInit, OnDestroy{
   async verPedido(pedido) {
     const modal = await this.modalCtrl.create({
       component: PedidoPage,
-      componentProps: {pedido}
+      componentProps: {pedido, esAsociado: this.esAsociado}
     })
 
     return await modal.present()
@@ -233,8 +187,7 @@ export class HomePage implements OnInit, OnDestroy{
   }
 
   tomarServicio(pedido: Notificacion) { // solo para Asociados
-    this.animationService.stopArrastraArray(pedido.idPedido)
-    // this.pedidoService.tomarPedido(pedido)
+    this.pedidoService.tomarPedido(pedido)
     this.pedidos_nuevos = this.pedidos_nuevos.filter(p => p.idPedido !== pedido.idPedido)
   }
   
@@ -249,7 +202,7 @@ export class HomePage implements OnInit, OnDestroy{
       }
       for (const pedido of this.pedidos_nuevos) {
         const now = Date.now()
-        const tolerancia = pedido.notificado + 20000
+        const tolerancia = pedido.notificado + 40000
         pedido.segundos_left = (tolerancia - now) / 1000
         if (pedido.segundos_left <= 0) {
           this.pedidos_nuevos = this.pedidos_nuevos.filter(p => p.idPedido !== pedido.idPedido)

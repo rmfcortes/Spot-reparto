@@ -1,13 +1,14 @@
 import { Component, OnInit, Input, AfterViewInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-
-import { PedidoService } from 'src/app/services/pedido.service';
+import { Router } from '@angular/router';
 
 import { ConfirmarPagoPage } from '../confirmar-pago/confirmar-pago.page';
 
 import { AnimationService } from 'src/app/services/animation.service';
+import { PedidoService } from 'src/app/services/pedido.service';
 
 import { Pedido } from 'src/app/interfaces/pedido';
+import { CommonService } from 'src/app/services/common.service';
 
 @Component({
   selector: 'app-pedido',
@@ -17,10 +18,13 @@ import { Pedido } from 'src/app/interfaces/pedido';
 export class PedidoPage implements OnInit, AfterViewInit {
 
   @Input() pedido: Pedido;
+  @Input() esAsociado: boolean;
 
   constructor(
+    private router: Router,
     private modalCtrl: ModalController,
     private animationService: AnimationService,
+    private commonService: CommonService,
     private pedidoService: PedidoService,
   ) { }
 
@@ -28,6 +32,21 @@ export class PedidoPage implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    if (this.pedido.recolectado) {
+      this.entregarBtn()
+    } else {
+      const boton = document.getElementById('rec')
+      const caja: HTMLElement = document.getElementById('caja_rec')
+      let width_caja = 0
+      setTimeout(() => {
+        width_caja = caja.clientWidth - 55
+        this.animationService.arrastra(boton, width_caja)
+        .then(() => this.recolectar())
+      }, 300)
+    }
+  }
+
+  entregarBtn() {
     const boton = document.getElementById('boton')
     const caja: HTMLElement = document.getElementById('caja')
     let cuenta
@@ -41,7 +60,19 @@ export class PedidoPage implements OnInit, AfterViewInit {
       this.animationService.arrastra(boton, width_caja)
       .then(() => this.entregar())
     }, 300)
+  }
 
+  recolectar() {
+    this.pedido.recolectado = true
+    this.pedidoService.tengoProductos(this.pedido)
+    setTimeout(() => {
+      this.entregarBtn()
+    }, 500)
+  }
+
+  async verMapa() {
+    this.commonService.setClienteTemporal(this.pedido.cliente)
+    this.router.navigate(['/mapa'])
   }
 
   async entregar() {
