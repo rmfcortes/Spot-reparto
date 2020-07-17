@@ -84,7 +84,30 @@
             </ng-container>
                 <!-- Camino al Cliente -->
             <ng-template #recolectadoTemp>
-                
+                <ion-list-header>
+                    <ion-label>Entregar a: <strong>{{item.cliente.nombre}}</strong></ion-label>
+                </ion-list-header>
+                <ion-item lines="none" detail (click)="verPedido(item)">
+                    <ion-label class="ion-text-wrap" color="medium">{{item.cliente.direccion.direccion}}</ion-label>
+                </ion-item>
+                <ion-item>
+                    <ion-button slot="start" (click)="verMapa(item.cliente)" fill="clear">
+                        Ver mapa
+                    </ion-button>
+                    <ion-button *ngIf="item.cliente.telefono" slot="end" fill="outline" (click)="llamar(item.cliente.telefono)" fill="clear">
+                        Llamar
+                    </ion-button>
+                    <ng-container *ngIf="item.unRead > 0; else chatTemplate" shape="round">
+                        <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)">
+                            Chat {{item.unRead}}
+                        </ion-button>
+                    </ng-container>
+                    <ng-template #chatTemplate>
+                        <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" shape="round" class="ion-text-wrap">
+                            Chat
+                        </ion-button>
+                    </ng-template>
+                </ion-item>
             </ng-template>
         
         </ion-card>

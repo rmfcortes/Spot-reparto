@@ -69,7 +69,6 @@ export class CommonService {
     if (this.cliente) return this.cliente
     else {
       this.cliente = JSON.parse( await this.getVariableFromStorage('cliente_temporal'))
-      console.log(this.cliente)
       return this.cliente
     }
     

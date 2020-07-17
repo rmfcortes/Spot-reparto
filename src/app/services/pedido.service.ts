@@ -54,6 +54,10 @@ export class PedidoService {
 
   async tengoProductos(pedido: Pedido) {
     const idRepartidor = this.uidService.getUid()
+    pedido.avances.push({
+      concepto: `${pedido.repartidor.nombre} tiene tus productos y está en camino a tu destino`,
+      fecha: Date.now()
+    })
     await this.db.object(`asignados/${idRepartidor}/${pedido.id}`).update(pedido)
   }
 

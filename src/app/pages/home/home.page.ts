@@ -70,7 +70,7 @@ export class HomePage implements OnInit, OnDestroy{
 
   isAsociado() {
     this.pedidoService.isAsociado()
-    .then(resp => {
+    .then(async (resp) => {
       this.activo = resp
       this.esAsociado = true
       this.backgroundMode.setAsociado(true)

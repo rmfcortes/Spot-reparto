@@ -73,6 +73,7 @@ export class PedidoPage implements OnInit, AfterViewInit {
   async verMapa() {
     this.commonService.setClienteTemporal(this.pedido.cliente)
     this.router.navigate(['/mapa'])
+    this.modalCtrl.dismiss()
   }
 
   async entregar() {

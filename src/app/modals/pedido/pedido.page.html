@@ -47,7 +47,7 @@
             <ion-label color="primary">Entregar en:</ion-label>
         </ion-list-header>
         <ion-item lines="none">
-            <ion-label>{{pedido.cliente.direccion.direccion}}</ion-label>
+            <ion-label class="ion-text-wrap">{{pedido.cliente.direccion.direccion}}</ion-label>
         </ion-item>
         <ion-item lines="none">
             <ion-button slot="end" (click)="verMapa()" shape="round">
@@ -70,7 +70,7 @@
         </div>
     </ion-toolbar>
 </ion-footer>
-<ion-footer class="ion-no-border">
+<ion-footer class="ion-no-border" *ngIf="!pedido.recolectado && esAsociado">
     <ion-toolbar style="margin-bottom: 1rem;" class="">
         <div class="caja_boton" id="caja_rec">
             <div class="text_entregar">
