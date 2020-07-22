@@ -11,7 +11,7 @@
                 </ion-item>
                 <ion-item style="--background: transparent;">
                     <ion-label color="light" position="floating">Contraseña</ion-label>
-                    <ion-input (keyup.enter)="$event.target.blur();" type="password" required [(ngModel)]="pass" name="telefono" minlength="5"></ion-input>
+                    <ion-input (keyup.enter)="$event.target.blur();" type="password" required [(ngModel)]="pass" name="telefono" minlength="6"></ion-input>
                 </ion-item>
                 <ion-button color="light" style="margin-top: 2rem" [disabled]="!forma.valid" expand="block" shape="round" type="submit">
                     Ingresar

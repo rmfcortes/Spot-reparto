@@ -45,7 +45,7 @@ export class AnimationService {
     this.pulseAnim = createAnimation()
     .addElement(el)
     .duration(1000)
-    .iterations(Infinity)
+    .iterations(3)
     .keyframes([
       { offset: 0, transform: 'scale(1)', opacity: '.8' },
       { offset: 0.5, transform: 'scale(1.15)', opacity: '1' },

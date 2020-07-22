@@ -87,11 +87,13 @@ export class PedidoPage implements OnInit, AfterViewInit {
         componentProps: {total: this.pedido.total}
       })
 
-      modal.onDidDismiss().then(resp => {
+      modal.onWillDismiss().then(resp => {
         if (resp) {
           this.pedidoService.finalizarPedido(this.pedido)
-          this.regresar()
           this.pedido = null
+          setTimeout(() => {
+            this.regresar()
+          }, 500)
         }
       })
       return await modal.present()

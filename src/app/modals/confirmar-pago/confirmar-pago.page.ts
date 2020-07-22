@@ -22,8 +22,4 @@ export class ConfirmarPagoPage implements OnInit {
     this.modalCtrl.dismiss(true)
   }
 
-  regresar() {
-    this.modalCtrl.dismiss()
-  }
-
 }
