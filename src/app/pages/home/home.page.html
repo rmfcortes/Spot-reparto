@@ -1,6 +1,6 @@
 <ion-header class="ion-no-border fondo-header">
     <ion-toolbar class="fondo-header">
-        <ion-buttons slot="start" *ngIf="esAsociado">
+        <ion-buttons slot="start">
             <ion-button (click)="cerrarSesion()">
                 <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
             </ion-button>
@@ -150,7 +150,7 @@
     </ion-item>    
 
     <!-- Inactivo -->
-    <ion-item lines="none" style="text-align: center; margin-top: 1rem;" *ngIf="!activo">
+    <ion-item lines="none" style="text-align: center; margin-top: 1rem;" *ngIf="!activo && esAsociado">
         <ion-label class="ion-text-wrap">Entra en Modo Activo para empezar a recibir pedidos</ion-label>
     </ion-item>
 </ion-content>

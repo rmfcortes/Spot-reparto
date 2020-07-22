@@ -6,12 +6,13 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class UidService {
 
-  uid: string;
-  nombre: string;
-  region: string;
-  asociado: boolean;
+  uid: string
+  nombre: string
+  region: string
+  asociado: boolean
+  tolerancia: number
 
-  public usuario = new BehaviorSubject(null);
+  public usuario = new BehaviorSubject(null)
 
   constructor() {  }
 
@@ -46,6 +47,14 @@ export class UidService {
 
   getAsociado() {
     return this.asociado
+  }
+
+  setTolerancia(tolerancia: number) {
+    this.tolerancia = tolerancia
+  }
+
+  getTolerancia() {
+    return this.tolerancia
   }
 
 }

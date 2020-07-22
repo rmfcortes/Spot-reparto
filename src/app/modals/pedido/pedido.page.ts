@@ -32,17 +32,21 @@ export class PedidoPage implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    if (this.pedido.recolectado) {
-      this.entregarBtn()
+    if (this.esAsociado) {
+      if (this.pedido.recolectado) {
+        this.entregarBtn()
+      } else {
+        const boton = document.getElementById('rec')
+        const caja: HTMLElement = document.getElementById('caja_rec')
+        let width_caja = 0
+        setTimeout(() => {
+          width_caja = caja.clientWidth - 55
+          this.animationService.arrastra(boton, width_caja)
+          .then(() => this.recolectar())
+        }, 300)
+      }
     } else {
-      const boton = document.getElementById('rec')
-      const caja: HTMLElement = document.getElementById('caja_rec')
-      let width_caja = 0
-      setTimeout(() => {
-        width_caja = caja.clientWidth - 55
-        this.animationService.arrastra(boton, width_caja)
-        .then(() => this.recolectar())
-      }, 300)
+      this.entregarBtn()
     }
   }
 

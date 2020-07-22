@@ -32,7 +32,11 @@ export class PedidoService {
         asocSub.unsubscribe()
         if (data) {
           this.uidService.setAsociado(true)
-          resolve(data.activo)
+          const espSub = this.db.object(`ciudades/${region}/espera`).valueChanges().subscribe((espera: number) => {
+            espSub.unsubscribe()
+            this.uidService.setTolerancia(espera)
+            resolve(data.activo)
+          })
         } else {
           this.uidService.setAsociado(false)
           reject(false)

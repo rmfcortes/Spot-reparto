@@ -194,6 +194,7 @@ export class HomePage implements OnInit, OnDestroy{
   // Auxiliar solo para Asociados
   cuentaRegresiva() {
     this.cuentaActiva = true
+    const espera = this.uidService.getTolerancia()
     setTimeout(() => {
       if (this.pedidos_nuevos.length === 0) {
         this.cuentaActiva = false
@@ -202,7 +203,7 @@ export class HomePage implements OnInit, OnDestroy{
       }
       for (const pedido of this.pedidos_nuevos) {
         const now = Date.now()
-        const tolerancia = pedido.notificado + 40000
+        const tolerancia = pedido.notificado + espera - 5000
         pedido.segundos_left = (tolerancia - now) / 1000
         if (pedido.segundos_left <= 0) {
           this.pedidos_nuevos = this.pedidos_nuevos.filter(p => p.idPedido !== pedido.idPedido)
