@@ -44,6 +44,8 @@ export class HomePage implements OnInit, OnDestroy{
   esAsociado = false
   activo = false
 
+  reload = false
+
   constructor(
     private router: Router,
     private callNumber: CallNumber,
@@ -61,6 +63,15 @@ export class HomePage implements OnInit, OnDestroy{
 
     // Info inicial
   ngOnInit(): void {
+    this.init()
+  }
+
+  ionViewWillEnter() {
+    if (this.reload) this.init()
+    this.reload = false
+  }
+
+  init() {
     this.nombre = this.uidService.getNombre()
     this.getPedidos()
     this.listenPermisos()
@@ -216,6 +227,7 @@ export class HomePage implements OnInit, OnDestroy{
   // Salida
 
   async cerrarSesion() {
+    this.reload = true
     this.cancelListeners()
     await this.authService.logout()
     this.router.navigate(['/login'])
