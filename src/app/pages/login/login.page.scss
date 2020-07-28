@@ -1,11 +1,48 @@
-ion-content.background {
-    --background: linear-gradient(197deg, rgb(248, 162, 3) 0%, rgb(235, 109, 6) 13.5%, rgb(246, 142, 6) 33.33%, rgb(250, 82, 3) 100%) !important;
-    --webkit-background-size: cover;
+.img-plaza {
+    height: 50vh;
+    float: right;
+    padding-right: 5rem;
 }
 
-.formulario {
-    width: 75vw;
-    margin-top: 4rem;
-    margin-left: auto;
-    margin-right: auto;
+.input {
+    border-bottom: rgb(202, 201, 201) 1px solid;
+}
+
+.margin {
+    width: 90%;
+    margin-left: 5%;
+}
+
+.box-form {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 6px 20px 0 rgba(0, 0, 0, 0.10);
+    background: white;
+    border-radius: 25px;
+    width: 100%;
+    padding: 2rem 0;
+    max-width: 500px;
+}
+
+.mobile-container {
+    height: 100vh;
+    margin: auto;
+}
+
+.mobile-box {
+    background: white;
+    border-radius: 25px;
+    width: 80%;
+    padding: 2rem 0;
+    max-width: 500px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.error-message {
+    color: red;
+    text-align: left;
+    margin-left: 2rem;
+    font-size: 12px;
 }

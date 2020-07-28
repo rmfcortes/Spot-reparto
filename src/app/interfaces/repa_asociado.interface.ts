@@ -11,3 +11,8 @@ export interface RepaAsociadoPreview {
     promedio: number
     telefono: string
 }
+
+export interface Ubicacion {
+    lat: number;
+    lng: number;
+}

@@ -46,7 +46,6 @@ export class RegionService {
         const uid = this.uidService.getUid()
         const regSub = this.db.object(`regiones_repartidores_asociados/${uid}`).valueChanges().subscribe((region: string) => {
           regSub.unsubscribe()
-
           if (region) {
             this.commonService.setVariableToStorage('region', region)
             this.uidService.setRegion(region)

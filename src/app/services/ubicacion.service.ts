@@ -5,8 +5,10 @@ import { Geolocation, GeolocationOptions, Geoposition } from '@ionic-native/geol
 
 import { AngularFireDatabase } from '@angular/fire/database';
 
-import { UidService } from './uid.service';
 import { CommonService } from './common.service';
+import { UidService } from './uid.service';
+
+import { Ubicacion } from '../interfaces/repa_asociado.interface';
 
 
 @Injectable({
@@ -14,12 +16,17 @@ import { CommonService } from './common.service';
 })
 export class UbicacionService {
 
-  public ubicacion = new BehaviorSubject({
+  public ubicacion = new BehaviorSubject<Ubicacion>({
     lat: 22.571956,
     lng: -102.253399
   })
 
-  trackInterval: any;
+  currentLocation: Ubicacion = {
+    lat: 22.571956,
+    lng: -102.253399
+  }
+
+  trackInterval: any
   intervalo = 1000 * 10
 
   options: GeolocationOptions = {
@@ -49,8 +56,8 @@ export class UbicacionService {
       .catch(err => {
         reject(err)
         this.commonService.setError('get_position_cliente', err)
-      });
-    });
+      })
+    })
   }
 
   setInterval() {
@@ -81,16 +88,14 @@ export class UbicacionService {
         this.lastLoc.lng,
         position.coords.latitude,
         position.coords.longitude,
-      );
-      if (d < 5) {
-        // Muy cerca
-        return;
-      } else {
+      )
+      if (d < 5) return
+      else {
         this.lastLoc = {
           lat: position.coords.latitude,
           lng: position.coords.longitude
         };
-        this.updateLocation(position);
+        this.updateLocation(position)
       }
     }
   }
@@ -102,7 +107,9 @@ export class UbicacionService {
       lat: data.coords.latitude,
       lng: data.coords.longitude,
     };
-    this.ubicacion.next(coords);
+    this.ubicacion.next(coords)
+    this.currentLocation.lat = coords.lat
+    this.currentLocation.lng = coords.lng
     const idRepartidor = this.uidService.getUid()
     const region = this.uidService.getRegion()
     console.log(region)
@@ -110,26 +117,34 @@ export class UbicacionService {
     if (this.uidService.getAsociado()) this.db.object(`repartidores_asociados_info/${region}/preview/${idRepartidor}`).update(coords)
   }
 
-  // Auxiliares
+  // Auxiliar
 
   calculaDistancia( lat1, lng1, lat2, lng2 ): Promise<number> {
     return new Promise ((resolve, reject) => {
-      const R = 6371; // Radius of the earth in km
-      const dLat = this.deg2rad(lat2 - lat1);  // this.deg2rad below
-      const dLon = this.deg2rad(lng2 - lng1);
+      const R = 6371 // Radius of the earth in km
+      const dLat = this.deg2rad(lat2 - lat1)  // this.deg2rad below
+      const dLon = this.deg2rad(lng2 - lng1)
       const a =
          Math.sin(dLat / 2) * Math.sin(dLat / 2) +
          Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) *
          Math.sin(dLon / 2) * Math.sin(dLon / 2)
-         ;
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const d = R * c * 1000; // Distance in mts
-      resolve(d);
-    });
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+      const d = R * c * 1000 // Distance in mts
+      resolve(d)
+    })
   }
 
   deg2rad( deg ) {
-    return deg * (Math.PI / 180);
+    return deg * (Math.PI / 180)
   }
+
+  // FCM Service 
+  getDistancia(lat: number, lng: number): Promise<number> {
+    return new Promise(async (resolve, reject) => {
+      const d = await this.calculaDistancia(this.currentLocation.lat, this.currentLocation.lng, lat, lng)
+      resolve(d)
+    })
+  }
+
 
 }

@@ -136,6 +136,7 @@ export class HomePage implements OnInit, OnDestroy{
   // Acciones
 
   toogleActive(value: boolean) {
+    this.activo = value
     if (this.pedidos.length > 0 && !value) {
       this.commonService.presentAlert('', 'Antes de pasar a Modo Inactivo, por favor completa todos tus servicios')
       .then(() => this.activo = true)
@@ -179,13 +180,13 @@ export class HomePage implements OnInit, OnDestroy{
 
   verMapaNuevoPedido(i) {
     const direccion: Direccion = {
-      direccion: this.pedidos_nuevos[i].cliente_direccion,
-      lat:this.pedidos_nuevos[i].cliente_lat,
-      lng:this.pedidos_nuevos[i].cliente_lng,
+      direccion: this.pedidos_nuevos[i].negocio_direccion,
+      lat:this.pedidos_nuevos[i].negocio_lat,
+      lng:this.pedidos_nuevos[i].negocio_lng,
     }
     const cliente: Cliente = {
       direccion,
-      nombre: this.pedidos_nuevos[i].cliente,
+      nombre: this.pedidos_nuevos[i].negocio,
       uid: 'pendiente',
       pedido_nuevo: true
     }

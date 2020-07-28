@@ -45,8 +45,8 @@ export class MapaPage implements OnInit {
       lng: this.cliente.direccion.lng
     }
     setTimeout(() => {
-      this.loadMap();
-    }, 350);
+      this.loadMap()
+    }, 350)
   }
 
   loadMap() {

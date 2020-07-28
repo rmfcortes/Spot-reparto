@@ -23,7 +23,7 @@ export class PedidoService {
     return new Promise((resolve, reject) => {
       const uid = this.uidService.getUid()
       const region = this.uidService.getRegion()
-      if (!region) {
+      if (!region || region === null) {
         this.uidService.setAsociado(false)
         return reject(false)
       }

@@ -109,5 +109,4 @@ export class CommonService {
 
     await alert.present()
   }
-
 }

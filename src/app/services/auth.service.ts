@@ -101,6 +101,7 @@ export class AuthService {
         this.commonService.removeFromStorage('uid')
         this.commonService.removeFromStorage('nombre')
         this.commonService.removeFromStorage('region')
+        this.commonService.removeFromStorage('region')
         this.uidService.setUid(null)
         this.uidService.setNombre(null)
         this.uidService.setRegion(null)

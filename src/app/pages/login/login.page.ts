@@ -1,6 +1,8 @@
+import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Component, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
 import { AuthService } from 'src/app/services/auth.service';
 import { AlertService } from 'src/app/services/alert.service';
@@ -18,35 +20,65 @@ export class LoginPage implements OnInit {
 
   isConnected = true
 
+  back: Subscription
   netSub: Subscription
+
+  err: string
+  form: FormGroup
+  validation_messages: any
+
 
   constructor(
     private router: Router,
+    private platform: Platform,
     private authService: AuthService,
     private alertService: AlertService,
     private netService: NetworkService,
   ) { }
 
   ngOnInit() {
+    this.setForm()
   }
 
   ionViewWillEnter() {
-    this.netSub = this.netService.isConnected.subscribe(res => {
-      this.isConnected = res
+    this.netSub = this.netService.isConnected.subscribe(res => this.isConnected = res)
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+      const nombre = 'app'
+      navigator[nombre].exitApp()
     })
   }
 
-  async ingresarConCorreo() {
-    await this.alertService.presentLoading();
-    try {
-      const correo = this.correo.trim() + '@spot.com'
-      const resp = await this.authService.loginWithEmail(correo, this.pass)
-      this.alertService.dismissLoading()
-      if (resp) {
-        this.router.navigate(['/home'])
-      } else {
-        this.alertService.presentAlert('Usuario no registrado', 'Por favor registra una cuenta antes de ingresar')
+  setForm() {
+    this.form = new FormGroup({
+      'email': new FormControl('', Validators.compose([Validators.required])),
+      'password': new FormControl('', Validators.compose([Validators.required, Validators.minLength(6)])),
+      'isPersistent': new FormControl(true)
+    },
+    { updateOn: 'blur'})
+
+    this.validation_messages = {
+      'email': [
+          { type: 'required', message: 'Este campo es necesario' },
+        ],
+        'password': [
+          { type: 'required', message: 'Este campo es requerido' },
+          { type: 'minlength', message: 'La contraseña debe tener al menos 6 caracteres' },
+        ],
       }
+  }
+
+  async ingresarConCorreo() {
+    this.form.controls.email.markAsTouched()
+    this.form.controls.password.markAsTouched()
+    if (!this.form.valid) return
+    await this.alertService.presentLoading()
+    this.err = ''
+    try {
+      const correo = this.form.value.email.trim() + '@spot.com'
+      const resp = await this.authService.loginWithEmail(correo, this.form.value.password)
+      this.alertService.dismissLoading()
+      if (resp) this.router.navigate(['/home'])
+      else this.alertService.presentAlert('Usuario no registrado', 'Por favor registra una cuenta antes de ingresar')
     } catch (error) {
       this.alertService.dismissLoading()
       if (error.code === 'auth/user-not-found') {
@@ -61,6 +93,7 @@ export class LoginPage implements OnInit {
 
   ionViewWillLeave() {
     if (this.netSub) this.netSub.unsubscribe()
+    if (this.back) this.back.unsubscribe()
   }
 
 }

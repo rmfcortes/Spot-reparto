@@ -129,6 +129,7 @@ export interface Notificacion {
     cliente_lat: number;                             
     cliente_lng: number;
     createdAt: number;
+    distancia: number;
     notificado: number;
     segundos_left?: number; 
     region?: string;       
