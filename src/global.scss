@@ -159,6 +159,18 @@
 //     }
 // }
 
+.loading-wrapper {
+    border: 1px solid var(--ion-color-primary);
+    border-radius: 20px !important;
+    overflow: hidden;
+}
+
+.alert-wrapper {
+    border: 1px solid var(--ion-color-primary);
+    border-radius: 20px !important;
+    overflow: hidden;
+}
+
 .my-custom-modal-css .modal-wrapper {
     height: 80%;
     width: 80%;

@@ -2,10 +2,10 @@
     <ion-toolbar class="fondo-header" style="border-bottom: 2px var(--ion-color-primary) solid;">
         <ion-buttons slot="start">
             <ion-button (click)="cerrarSesion()">
-                <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+                <ion-icon slot="icon-only" name="log-out"></ion-icon>
             </ion-button>
         </ion-buttons>
-        <ion-title>
+        <ion-title style="font-weight: 700;">
             {{nombre | titlecase}}
         </ion-title>
         <ion-buttons slot="end" *ngIf="esAsociado">

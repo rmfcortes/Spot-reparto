@@ -1,6 +1,6 @@
 import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Platform, IonInput } from '@ionic/angular';
 import { Component, OnInit } from '@angular/core';
-import { Platform } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
@@ -66,6 +66,17 @@ export class LoginPage implements OnInit {
         ],
       }
   }
+
+  focus(nextElement: IonInput) {
+    nextElement.setFocus()
+  }  
+  
+  async blur(nextElement: IonInput) {
+    const h: HTMLInputElement = await nextElement.getInputElement()
+    h.blur()
+    this.ingresarConCorreo()
+  }
+
 
   async ingresarConCorreo() {
     this.form.controls.email.markAsTouched()

@@ -8,7 +8,7 @@
             <p style="margin-bottom: 4rem;">Plaza para repartidores</p>
             <ion-item lines="none" class="input margin">
                 <ion-label position="floating" class="grey">Usuario</ion-label>
-                <ion-input type="email" formControlName="email" class="form-control" required></ion-input>
+                <ion-input (keyup.enter)="focus(a)" type="text" formControlName="email" class="form-control" required></ion-input>
             </ion-item>
             <ng-container *ngFor="let validation of validation_messages.email">
                 <div class="error-message" *ngIf="form.get('email').hasError(validation.type) && (form.get('email').dirty || form.get('email').touched)">
@@ -17,7 +17,7 @@
             </ng-container>
             <ion-item lines="none" class="input margin">
                 <ion-label position="floating" class="grey">Contraseña</ion-label>
-                <ion-input type="password" required formControlName="password"></ion-input>
+                <ion-input (keyup.enter)="blur(a)" #a type="password" required formControlName="password"></ion-input>
             </ion-item>
             <ng-container *ngFor="let validation of validation_messages.password">
                 <div class="error-message" *ngIf="form.get('password').hasError(validation.type) && (form.get('password').dirty || form.get('password').touched)">
