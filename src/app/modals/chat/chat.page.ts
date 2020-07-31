@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, Input, NgZone } from '@angular/core';
-import { IonContent, ModalController } from '@ionic/angular';
+import { IonContent, ModalController, Platform } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
 import { Mensaje, UnreadMsg } from 'src/app/interfaces/chat';
@@ -13,65 +13,65 @@ import { UidService } from 'src/app/services/uid.service';
 })
 export class ChatPage implements OnInit {
 
-  @ViewChild(IonContent, {static: true}) content: IonContent;
-  @Input() idPedido;
-  @Input() idCliente;
-  @Input() nombreCliente;
+  @ViewChild(IonContent, {static: true}) content: IonContent
+  @Input() idPedido
+  @Input() idCliente
+  @Input() nombreCliente
 
-  messages: Mensaje[] = [];
+  messages: Mensaje[] = []
 
-  newMsg = '';
+  newMsg = ''
+  status = ''
 
-  status = '';
-
-  unReadSub: Subscription;
-  stateSub: Subscription;
+  unReadSub: Subscription
+  stateSub: Subscription
+  back: Subscription
 
   constructor(
     private ngZone: NgZone,
+    private platform: Platform,
     private modalCtrl: ModalController,
     private chatService: ChatService,
     private uidService: UidService,
   ) { }
 
   ngOnInit() {
+    this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
+      this.regresar()
+    })
   }
+  
   ionViewWillEnter() {
-    this.chatService.setSeen(this.idPedido);
-    this.listenMsg();
-    this.setSeen();
-    this.listenState();
-    this.listenUnread();
+    this.setSeen()
+    this.listenMsg()
+    this.listenState()
+    this.listenUnread()
   }
 
   listenMsg() {
     this.chatService.newMsg(this.idPedido).query.ref.on('child_added', snapshot => {
       this.ngZone.run(() => {
-        const mensaje = snapshot.val();
-        this.messages.push(mensaje);
-        setTimeout(() => {
-          this.content.scrollToBottom(0);
-        }, 500);
-      });
-    });
+        const mensaje = snapshot.val()
+        this.messages.push(mensaje)
+        setTimeout(() =>  this.content.scrollToBottom(0), 500)
+      })
+    })
   }
 
   setSeen() {
-    this.chatService.setSeen(this.idPedido);
+    this.chatService.setSeen(this.idPedido)
   }
 
   listenUnread() {
     this.unReadSub = this.chatService.listenUnread(this.idPedido).subscribe((mensajes: UnreadMsg) => {
-        if (mensajes && mensajes.cantidad > 0) {
-          this.setSeen();
-        }
-    });
+        if (mensajes && mensajes.cantidad > 0) this.setSeen()
+    })
   }
 
   listenState() {
     this.stateSub = this.chatService.listenStatus(this.idPedido).subscribe((estado: any) => {
-      this.status = estado || null;
-    });
+      this.status = estado || null
+    })
   }
 
   sendMessage() {
@@ -81,19 +81,17 @@ export class ChatPage implements OnInit {
       msg: this.newMsg,
       idCliente: this.idCliente,
       repartidor: this.uidService.getNombre()
-    };
+    }
     this.chatService.publicarMsg(this.idPedido, newMsg)
-    this.newMsg = '';
-    setTimeout(() => {
-      this.content.scrollToBottom(0);
-    });
+    this.newMsg = ''
+    setTimeout(() => this.content.scrollToBottom(0), 500)
   }
 
   regresar() {
-    this.chatService.newMsg(this.idPedido).query.ref.off('child_added');
-    if (this.unReadSub) { this.unReadSub.unsubscribe(); }
-    if (this.stateSub) { this.stateSub.unsubscribe(); }
-    this.modalCtrl.dismiss();
+    this.chatService.newMsg(this.idPedido).query.ref.off('child_added')
+    if (this.unReadSub) this.unReadSub.unsubscribe()
+    if (this.stateSub) this.stateSub.unsubscribe()
+    this.modalCtrl.dismiss()
   }
 
 }

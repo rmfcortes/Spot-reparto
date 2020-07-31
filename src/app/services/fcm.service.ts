@@ -33,8 +33,16 @@ export class FcmService {
     private uidService: UidService,
   ) {  }
 
-  initAudio() {
-    this.audio.preloadSimple('alerta', 'assets/sounds/loving-you.mp3')
+  initAudio(): Promise<boolean>{
+    return new Promise(async (resolve, reject) => {      
+      this.audio.preloadSimple('alerta', 'assets/sounds/loving-you.mp3')
+      this.audio.preloadSimple('mensaje', 'assets/sounds/mensaje.mp3')
+      resolve()
+    })
+  }
+
+  playMensaje() {
+    this.audio.play('mensaje')
   }
 
   requestToken() {

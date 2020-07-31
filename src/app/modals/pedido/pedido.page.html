@@ -4,80 +4,108 @@
             <ion-button (click)="regresar()">
                 <ion-icon slot="start" name="chevron-back"></ion-icon>
             </ion-button>
-        </ion-buttons>
-        <ion-title>{{pedido.cliente.nombre}}</ion-title>
+        </ion-buttons>        
     </ion-toolbar>
 </ion-header>
 
 <ion-content>
-    <!-- Datos cliente -->
-    <ion-card>
-        <ion-list-header>
-            <ion-label color="primary">Cliente</ion-label>
-        </ion-list-header>
-        <ion-item *ngIf="pedido.cliente.telefono" lines="none">
-            <ion-label>{{pedido.cliente.nombre}}: {{pedido.cliente.telefono}}</ion-label>
+    <!-- Datos restaurante -->
+    <ion-card *ngIf="esAsociado && pedido">
+        <ion-item lines="full">
+            <h2>Recoger en: {{pedido.negocio.nombreNegocio}}</h2>
         </ion-item>
+        <ion-item lines="none">
+            <ion-label class="ion-text-wrap">{{pedido.negocio.direccion.direccion}}</ion-label>
+            <ion-icon slot="end" color="primary" name="map" *ngIf="!pedido.repartidor_llego" (click)="verMapa(pedido.negocio)"></ion-icon>
+            <ion-icon slot="end" color="primary" name="navigate" *ngIf="!pedido.repartidor_llego" (click)="navigate(pedido.negocio.direccion.lat, pedido.negocio.direccion.lng)"></ion-icon>
+        </ion-item>        
+        <ion-item lines="none" (click)="llamar(pedido.negocio.telefono)">
+            <ion-label class="ion-text-wrap">{{pedido.negocio.telefono}}</ion-label>
+            <ion-icon slot="end" color="primary" name="call"></ion-icon>
+        </ion-item>
+        <ion-item lines="full" *ngIf="!pedido.recolectado">
+            <h5 style="font-weight: 700;">Entregar a: {{pedido.cliente.nombre}}</h5>
+            <ng-container *ngIf="pedido.unRead > 0; else chatTemplate">
+                <ion-button fill="clear" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end">
+                    <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
+                    <ion-badge [class.badge-one]="pedido.unRead < 10" [class.badge-two]="pedido.unRead >= 10" color="dark">{{ pedido.unRead }}</ion-badge>
+                </ion-button>
+            </ng-container>
+            <ng-template #chatTemplate>
+                <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end"></ion-icon>
+            </ng-template>
+            <ion-icon (click)="llamar(pedido.cliente.telefono)" slot="end" name="call" *ngIf="pedido.cliente.telefono"></ion-icon>
+        </ion-item>  
+        <div class="caja_boton" id="caja_llegue" *ngIf="!pedido.repartidor_llego">
+            <div class="text_entregar">
+                LLEGUÉ AL PUNTO 1
+                <ion-icon name="play-forward" color="primary"></ion-icon>
+            </div>
+            <div class="boton" id="llegue_btn"></div>
+        </div>
     </ion-card>
     <!-- Lista productos -->
-    <ion-card>
-        <ion-list-header>
-            <ion-label color="primary">Productos</ion-label>
-        </ion-list-header>
-        <ion-item *ngFor="let producto of pedido.productos let i = index" lines="full">
+    <ion-card *ngIf="!esAsociado && pedido || pedido.repartidor_llego && pedido">
+        <ion-item lines="full">
+            <h2>Productos</h2>
+        </ion-item>
+        <ion-item *ngFor="let producto of pedido.productos let i = index; let odd = odd" [ngClass]="{'contraste': odd}" lines="none">
             <ion-badge color="primary" slot="start">{{producto.cantidad}}</ion-badge>
             <ion-thumbnail slot="start">
                 <img [src]="producto.url">
             </ion-thumbnail>
             <ion-label>
-                <h2 class="ion-text-wrap">{{producto.nombre | titlecase}}
-                    <ion-text color="primary">{{producto.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</ion-text>
-                </h2>
+                <h2 class="ion-text-wrap" style="margin-left: 0;">{{producto.nombre | titlecase}}</h2>
                 <p>{{producto.observaciones | titlecase}}</p>
                 <div *ngFor="let item of producto.complementos">
                     <h4>+ {{item.titulo | titlecase}}</h4>
-                    <p style="color: var(--ion-color-primary); margin-left: 0.5rem;" *ngFor="let com of item.complementos">{{com.nombre}}: {{com.precio | currency:'CAD':'symbol-narrow':'1.0-2'}}</p>
+                    <p style="color: var(--ion-color-primary); margin-left: 0.5rem;" *ngFor="let com of item.complementos">{{com.nombre}}</p>
                 </div>
             </ion-label>
+            <ion-checkbox slot="end" color="primary" [(ngModel)]="producto.checked" (ionChange)="readyToLeave()" *ngIf="!pedido.recolectado"></ion-checkbox>
         </ion-item>
+        <div class="caja_boton" id="caja_recoleccion" *ngIf="!pedido.recolectado && esAsociado">
+            <div class="text_entregar">
+                TENGO LOS PRODUCTOS >>>
+            </div>
+            <div class="boton" id="recoleccion_btn">
+            </div>
+        </div>
     </ion-card>
     <!-- Detalles entrega -->
-    <ion-card *ngIf="pedido.recolectado">
-        <ion-list-header>
-            <ion-label color="primary">Entregar en:</ion-label>
-        </ion-list-header>
+    <ion-card *ngIf="pedido.recolectado && pedido || !esAsociado && pedido">
+        <ion-item lines="full">
+            <h2>Entregar a: {{pedido.cliente.nombre}}</h2>
+            <ng-container *ngIf="pedido.unRead > 0; else chatTemplate" shape="round">
+                <ion-button fill="clear" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end">
+                    <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
+                    <ion-badge [class.badge-one]="pedido.unRead < 10" [class.badge-two]="pedido.unRead >= 10" color="dark">{{ pedido.unRead }}</ion-badge>
+                </ion-button>
+            </ng-container>
+            <ng-template #chatTemplate>
+                <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end"></ion-icon>
+            </ng-template>
+        </ion-item>
         <ion-item lines="none">
             <ion-label class="ion-text-wrap">{{pedido.cliente.direccion.direccion}}</ion-label>
+            <ion-icon slot="end" color="primary" name="map" (click)="verMapa(pedido.cliente)"></ion-icon>
+            <ion-icon slot="end" color="primary" name="navigate" (click)="navigate(pedido.cliente.direccion.lat, pedido.cliente.direccion.lng)"></ion-icon>
+        </ion-item>        
+        <ion-item lines="none" (click)="llamar(pedido.cliente.telefono)" *ngIf="pedido.cliente.telefono">
+            <ion-label class="ion-text-wrap">{{pedido.cliente.telefono}}</ion-label>
+            <ion-icon slot="end" color="primary" name="call"></ion-icon>
         </ion-item>
-        <ion-item lines="none">
-            <ion-button slot="end" (click)="verMapa()" shape="round">
-                Ver mapa
-            </ion-button>
-        </ion-item>
+        <div *ngIf="pedido.recolectado || !esAsociado">
+            <div style="width: 100%; text-align: center;">
+                <h1 style="font-weight: 700; color: black;" id="cuenta" *ngIf="pedido.formaPago.forma === 'efectivo'">Pago en efectivo: {{pedido.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</h1>
+            </div>
+            <div class="caja_boton" id="caja">
+                <div class="text_entregar">
+                    ENTREGAR >>>
+                </div>
+                <div class="boton" id="boton">
+                </div>
+            </div>
+        </div>
     </ion-card>
 </ion-content>
-<ion-footer *ngIf="pedido.recolectado || !esAsociado">
-    <ion-toolbar style="text-align: center;" *ngIf="pedido.formaPago.forma === 'efectivo'">
-        <h1 class="primario" id="cuenta">Pago en efectivo: {{pedido.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</h1>
-    </ion-toolbar>
-    <ion-toolbar style="margin-bottom: 1rem;">
-        <div class="caja_boton" id="caja">
-            <div class="text_entregar">
-                Entregar >>>
-            </div>
-            <div class="boton" id="boton">
-            </div>
-        </div>
-    </ion-toolbar>
-</ion-footer>
-<ion-footer class="ion-no-border" *ngIf="!pedido.recolectado && esAsociado">
-    <ion-toolbar style="margin-bottom: 1rem;" class="fondo-content">
-        <div class="caja_boton" id="caja_rec">
-            <div class="text_entregar">
-                Tengo los productos >>>
-            </div>
-            <div class="boton" id="rec">
-            </div>
-        </div>
-    </ion-toolbar>
-</ion-footer>

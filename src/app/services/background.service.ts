@@ -10,16 +10,26 @@ import { AngularFireDatabase } from '@angular/fire/database';
 import { UbicacionService } from './ubicacion.service';
 import { FcmService } from './fcm.service';
 import { UidService } from './uid.service';
+import { ChatService } from './chat.service';
+
+import { UnreadMsg } from '../interfaces/chat';
+import { stringify } from '@angular/compiler/src/util';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class BackgroundModeService {
 
+
+  unreadSub: Subscription
   backSubscription: Subscription
   frontSubscription: Subscription
 
   isAsocidado = false
+
+  hayPedidos = false
+  unreads: UnreadMsg[] = []
 
   constructor(
     private ngZone: NgZone,
@@ -27,12 +37,20 @@ export class BackgroundModeService {
     private db: AngularFireDatabase,
     public backgroundMode: BackgroundMode,
     private ubicacionService: UbicacionService,
+    private chatService: ChatService,
     private uidService: UidService,
     private fcmService: FcmService,
   ) { }
 
   setAsociado(value: boolean) {
     this.isAsocidado = value
+  }
+
+  setPedidos(value: boolean) {
+    this.hayPedidos = value
+    if (this.hayPedidos) this.listenNewMsg()
+    else if (this.unreadSub) this.unreadSub.unsubscribe()
+
   }
 
   async initBackgroundMode() {
@@ -42,7 +60,7 @@ export class BackgroundModeService {
       this.setBackMode()
       this.setFrontMode()
       this.backgroundMode.enable()
-      // this.backgroundMode.excludeFromTaskList();
+      // this.backgroundMode.excludeFromTaskList()
     })
   }
 
@@ -54,6 +72,9 @@ export class BackgroundModeService {
         if (this.isAsocidado) this.listenNotificationsOnBackground()
         this.ubicacionService.clearInterval()
         this.ubicacionService.setInterval()
+        if (this.hayPedidos) this.listenNewMsg()
+        else if (this.unreadSub) this.unreadSub.unsubscribe()
+
       })
     })
   }
@@ -61,9 +82,11 @@ export class BackgroundModeService {
   listenNotificationsOnBackground() {
     const uid = this.uidService.getUid()
     this.db.object(`notifications/${uid}`).query.ref.on('child_added', snap => {
-      this.backgroundMode.unlock()
-      const notification = snap.val()
-      this.fcmService.newNotification(notification)
+      this.ngZone.run(() => {
+        this.backgroundMode.unlock()
+        const notification = snap.val()
+        this.fcmService.newNotification(notification)
+      })
     })
   }
 
@@ -75,6 +98,9 @@ export class BackgroundModeService {
         if (this.isAsocidado) this.stopListenNotificationsBack()
         this.ubicacionService.clearInterval()
         this.ubicacionService.setInterval()
+        if (this.hayPedidos) this.listenNewMsg()
+        else if (this.unreadSub) this.unreadSub.unsubscribe()
+
       })
     })
   }
@@ -84,6 +110,18 @@ export class BackgroundModeService {
     this.db.object(`notifications/${uid}`).query.ref.off('child_added')
   }
 
+  listenNewMsg() {
+    if (this.unreadSub) this.unreadSub.unsubscribe()
+    this.unreadSub = this.chatService.listenMsg().subscribe((unreads: UnreadMsg[]) => {
+      this.ngZone.run(() => {
+        if (JSON.stringify(this.unreads) === JSON.stringify(unreads)) return
+        if (this.unreads.length > unreads.length) return this.unreads = unreads
+        this.fcmService.playMensaje()
+        this.unreads = unreads
+      })
+    })
+  }
+
   unlock() {
     this.backgroundMode.unlock()
   }
@@ -91,6 +129,7 @@ export class BackgroundModeService {
   deshabilitaBackground() {
     if (this.frontSubscription) this.frontSubscription.unsubscribe()
     if (this.backSubscription) this.backSubscription.unsubscribe()
+    if (this.unreadSub) this.unreadSub.unsubscribe()
     this.backgroundMode.disable()
   }
 

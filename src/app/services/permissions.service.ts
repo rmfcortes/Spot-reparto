@@ -17,10 +17,10 @@ import { Permisos } from '../interfaces/permisos.interface';
 export class PermissionsService {
 
   permisos_value: Permisos = {
-    gps: true,
-    fcm: true,
-    token: true,
-    location: true,
+    gps: false,
+    fcm: false,
+    token: false,
+    location: false,
   }
 
   permisos = new BehaviorSubject<Permisos>(this.permisos_value)
@@ -36,15 +36,9 @@ export class PermissionsService {
 
   checkPermisos(): Promise<boolean> {
     return new Promise((resolve, reject) => {      
-      if (
-        this.permisos_value.gps &&
-        this.permisos_value.fcm &&
-        this.permisos_value.token &&
-        this.permisos_value.location
-      ) return resolve(true)
       Promise.all([
-        this.isLocationAuthorized,
         this.isRemoteNotificationsEnabled(),
+        this.isLocationAuthorized(),
         this.isGpsLocationEnabled(),
         this.getToken(),
       ])
@@ -58,14 +52,16 @@ export class PermissionsService {
         return resolve(false)
       })
       .catch(err => reject(err))
-    });
+    })
   }
 
   getToken(): Promise<boolean>  {
     return new Promise((resolve, reject) => {
-     const uid = this.uidService.getUid();
-     const tokSub = this.db.object(`repartidores_tokens/${uid}/token`).valueChanges().subscribe((token: string) => {
-       tokSub.unsubscribe();
+     if (this.permisos_value.token) return resolve(true)
+     const uid = this.uidService.getUid()
+     const region = this.uidService.getRegion()
+     const tokSub = this.db.object(`repartidores_asociados_info/${region}/preview/${uid}/token`).valueChanges().subscribe((token: string) => {
+       tokSub.unsubscribe()
        if (token) {
          resolve(true)
          this.permisos_value.token = true
@@ -76,8 +72,8 @@ export class PermissionsService {
         this.permisos.next(this.permisos_value)
         resolve(false)
        }
-     });
-    });
+     })
+    })
   }
 
   // Check if application having GPS access permission
@@ -90,7 +86,7 @@ export class PermissionsService {
         resolve(status)
       })
       .catch(err => reject(err))
-    });
+    })
   }
 
   isRemoteNotificationsEnabled(): Promise<boolean> {
@@ -102,7 +98,7 @@ export class PermissionsService {
         resolve(resp)
       })
       .catch(err => reject(err))
-    });
+    })
   }
 
   isGpsLocationEnabled(): Promise<boolean> {
@@ -114,7 +110,7 @@ export class PermissionsService {
         this.permisos.next(this.permisos_value)
       })
       .catch(err => reject(err))
-    });
+    })
   }
 
   // Requests
@@ -123,28 +119,27 @@ export class PermissionsService {
     return new Promise((resolve, reject) => {
       this.diagnostic.requestLocationAuthorization()
       .then(status => {
-        console.log(status);
         switch(status){
           case this.diagnostic.permissionStatus.NOT_REQUESTED:
-              console.log("Permission not requested");
+              console.log("Permission not requested")
               resolve(false)
-              break;
+              break
           case this.diagnostic.permissionStatus.GRANTED:
-              console.log("Permission granted");
+              console.log("Permission granted")
               resolve(true)
-              break;
+              break
           case this.diagnostic.permissionStatus.DENIED_ONCE:
-              console.log("Permission denied");
+              console.log("Permission denied")
               resolve(false)
-              break;
+              break
           case this.diagnostic.permissionStatus.DENIED_ALWAYS:
-              console.log("Permission permanently denied");
+              console.log("Permission permanently denied")
               resolve(false)
-              break;
+              break
       }
       })
       .catch(err => reject(err))
-    });
+    })
   }
 
   requestHighAccuracyLocation(): Promise<boolean> {
@@ -152,7 +147,7 @@ export class PermissionsService {
       this.locationAccuracy.request(this.locationAccuracy.REQUEST_PRIORITY_HIGH_ACCURACY)
       .then(() => resolve(true))
       .catch(err => reject(err))
-    });
+    })
   }
 
 }

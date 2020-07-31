@@ -19,87 +19,88 @@
 <ion-content>
     <!-- Pedidos nuevos -->
     <ion-card *ngFor="let item of pedidos_nuevos; let i = index">
-        <ion-list-header>
-            <ion-label>
-                <ion-text color="dark">
-                    <h2 style="font-weight: 700; margin-left: 1rem;">Recoger en: 
-                        <strong>{{item.negocio}}</strong>
-                    </h2>
-                </ion-text>
-            </ion-label>
-            <ion-badge class="gradient--" mode="ios" style="margin-right: 1rem;">00:{{item.segundos_left | number:'1.0-0'}}</ion-badge>
-        </ion-list-header>
-        <ion-item lines="none">
-            <ion-label class="ion-text-wrap" color="medium">{{item.negocio_direccion}}</ion-label>
+        <ion-item lines="full">
+            <h2>Recoger en: {{item.negocio}}</h2>
+            <ion-badge slot="end" class="gradient--" mode="ios" style="margin-right: 1rem;">00:{{item.segundos_left | number:'1.0-0'}}</ion-badge>
+        </ion-item>
+        <ion-item lines="none" (click)="verMapaNuevoPedido(i)">
+            <ion-label class="ion-text-wrap">{{item.negocio_direccion}}</ion-label>
+            <ion-icon slot="end" color="primary" name="map"></ion-icon>
         </ion-item>
         <ion-item lines="full">
-            <ion-label style="font-weight: 700; font-size: large;">A: {{item.distancia / 1000 | number:'1.0-2'}}kms</ion-label>
-            <ion-button slot="end" fill="outline" (click)="verMapaNuevoPedido(i)">
-                Ver mapa
-            </ion-button>
+            <div style="width: 100%; text-align: center;">
+                <h2 style="font-weight: 700; color: black;">A: {{item.distancia / 1000 | number:'1.0-2'}}kms</h2>
+            </div>
         </ion-item>
         <ion-button (click)="tomarServicio(item)" expand="block" shape="round" class="boton-margen gradient--" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
             Tomar pedido. Gana {{item.ganancia + item.propina | currency:'CAD':'symbol-narrow':'1.0-2'}}
-        </ion-button>
+        </ion-button>        
     </ion-card>
-
 
     <!-- Pedidos en curso-->
         <!-- Repartidores asociados -->
     <ng-container *ngIf="esAsociado; else asocTemp">
         <ion-card *ngFor="let item of pedidos">
             <!-- Camino a la tienda -->
-            <ng-container *ngIf="!item.recolectado; else recolectadoTemp">             
-                <ion-list-header>
-                    <ion-label>Recoger en: <strong>{{item.negocio.nombreNegocio}}</strong></ion-label>
-                </ion-list-header>
-                <ion-item lines="none" detail (click)="verPedido(item)">
-                    <ion-label class="ion-text-wrap" color="medium">{{item.negocio.direccion.direccion}}</ion-label>
+            <ng-container *ngIf="!item.recolectado; else recolectadoTemp">
+                <h2>Recoger en: {{item.negocio.nombreNegocio}}</h2>
+                <ion-item lines="none">
+                    <ion-label class="ion-text-wrap">{{item.negocio.direccion.direccion}}</ion-label>
+                    <ion-icon slot="end" color="primary" name="map" (click)="verMapa(item.negocio)"></ion-icon>
+                    <ion-icon slot="end" color="primary" name="navigate" (click)="navigate(item.negocio.direccion.lat, item.negocio.direccion.lng)"></ion-icon>
+                </ion-item>        
+                <ion-item lines="none" (click)="llamar(item.negocio.telefono)">
+                    <ion-label class="ion-text-wrap">{{item.negocio.telefono}}</ion-label>
+                    <ion-icon slot="end" color="primary" name="call"></ion-icon>
                 </ion-item>
-                <ion-item>
-                    <ion-button slot="start" (click)="verMapa(item.negocio)" fill="clear">
-                        Ver mapa
-                    </ion-button>
-                    <ion-button *ngIf="item.negocio.telefono" slot="end" fill="outline" (click)="llamar(item.negocio.telefono)" fill="clear">
-                        Llamar
-                    </ion-button>
-                    <ng-container *ngIf="item.unRead > 0; else chatTemplate" shape="round">
-                        <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)">
-                            Chat {{item.unRead}}
+                <ion-item lines="full">
+                    <h5 style="font-weight: 700;">Entregar a: {{item.cliente.nombre}}</h5>
+                    <ng-container *ngIf="item.unRead > 0; else chatTemplate">
+                        <ion-button fill="clear" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end">
+                            <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
+                            <ion-badge [class.badge-one]="item.unRead < 10" [class.badge-two]="item.unRead >= 10" color="dark">{{ item.unRead }}</ion-badge>
                         </ion-button>
                     </ng-container>
                     <ng-template #chatTemplate>
-                        <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" shape="round" class="ion-text-wrap">
-                            Chat con el cliente
-                        </ion-button>
+                        <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end"></ion-icon>
                     </ng-template>
+                    <ion-icon (click)="llamar(item.cliente.telefono)" slot="end" name="call" *ngIf="item.cliente.telefono"></ion-icon>
+                </ion-item>    
+                <ion-item style="margin-top: 0.5rem;">
+                    <ion-label color="primary" style="font-weight: 700;">Gana: {{item.envio  + item.propina | currency:'CAD':'symbol-narrow':'1.0-2' }}</ion-label>
+                    <ion-button (click)="verPedido(item)" slot="end" class="gradient--">
+                        Detalles pedido
+                    </ion-button>                    
                 </ion-item>
             </ng-container>
                 <!-- Camino al Cliente -->
             <ng-template #recolectadoTemp>
-                <ion-list-header>
-                    <ion-label>Entregar a: <strong>{{item.cliente.nombre}}</strong></ion-label>
-                </ion-list-header>
-                <ion-item lines="none" detail (click)="verPedido(item)">
-                    <ion-label class="ion-text-wrap" color="medium">{{item.cliente.direccion.direccion}}</ion-label>
-                </ion-item>
-                <ion-item>
-                    <ion-button slot="start" (click)="verMapa(item.cliente)" fill="clear">
-                        Ver mapa
-                    </ion-button>
-                    <ion-button *ngIf="item.cliente.telefono" slot="end" fill="outline" (click)="llamar(item.cliente.telefono)" fill="clear">
-                        Llamar
-                    </ion-button>
+                <ion-item lines="full">
+                    <h2>Entregar a: {{item.cliente.nombre}}</h2>
                     <ng-container *ngIf="item.unRead > 0; else chatTemplate" shape="round">
-                        <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)">
-                            Chat {{item.unRead}}
+                        <ion-button fill="clear" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end">
+                            <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
+                            <ion-badge [class.badge-one]="item.unRead < 10" [class.badge-two]="item.unRead >= 10" color="dark">{{ item.unRead }}</ion-badge>
                         </ion-button>
                     </ng-container>
                     <ng-template #chatTemplate>
-                        <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" shape="round" class="ion-text-wrap">
-                            Chat
-                        </ion-button>
+                        <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end"></ion-icon>
                     </ng-template>
+                </ion-item>
+                <ion-item lines="none">
+                    <ion-label class="ion-text-wrap">{{item.cliente.direccion.direccion}}</ion-label>
+                    <ion-icon slot="end" color="primary" name="map" (click)="verMapa(item.cliente)"></ion-icon>
+                    <ion-icon slot="end" color="primary" name="navigate" (click)="navigate(item.cliente.direccion.lat, item.cliente.direccion.lng)"></ion-icon>
+                </ion-item>        
+                <ion-item lines="full" (click)="llamar(item.cliente.telefono)" *ngIf="item.cliente.telefono">
+                    <ion-label class="ion-text-wrap">{{item.cliente.telefono}}</ion-label>
+                    <ion-icon slot="end" color="primary" name="call"></ion-icon>
+                </ion-item>
+                <ion-item lines="none" style="margin-top: 0.5rem;">
+                    <ion-label color="primary" style="font-weight: 700;">Gana: {{item.envio  + item.propina | currency:'CAD':'symbol-narrow':'1.0-2' }}</ion-label>
+                    <ion-button slot="end" (click)="verPedido(item)" class="gradient--">
+                        Detalles pedido
+                    </ion-button>
                 </ion-item>
             </ng-template>
         

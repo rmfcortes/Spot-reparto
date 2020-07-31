@@ -23,6 +23,7 @@ export interface Pedido {
     repartidor_solicitado: boolean;
     recolectado?: boolean;
     unRead: number;
+    repartidor_llego: boolean;
 }
 
 export interface Avance {
@@ -98,6 +99,7 @@ export interface Producto{
     unidad?: string;
     url: string;
     variables: boolean;
+    checked: boolean;
 }
 
 export interface ListaComplementosElegidos {

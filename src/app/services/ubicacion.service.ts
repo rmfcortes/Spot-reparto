@@ -2,6 +2,7 @@ import { Injectable, NgZone } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { Geolocation, GeolocationOptions, Geoposition } from '@ionic-native/geolocation/ngx';
+import { LaunchNavigator, LaunchNavigatorOptions } from '@ionic-native/launch-navigator/ngx';
 
 import { AngularFireDatabase } from '@angular/fire/database';
 
@@ -9,6 +10,7 @@ import { CommonService } from './common.service';
 import { UidService } from './uid.service';
 
 import { Ubicacion } from '../interfaces/repa_asociado.interface';
+import { AlertService } from './alert.service';
 
 
 @Injectable({
@@ -42,12 +44,14 @@ export class UbicacionService {
     private ngZone: NgZone,
     private db: AngularFireDatabase,
     public geolocation: Geolocation,
+    private launchNavigator: LaunchNavigator,
     private commonService: CommonService,
+    private alertService: AlertService,
     private uidService: UidService,
   ) { }
 
    // Track position
-   getPosition(): Promise<Geoposition> {
+  getPosition(): Promise<Geoposition> {
     return new Promise((resolve, reject) => {      
       this.geolocation.getCurrentPosition(this.options)
       .then((position: Geoposition) => {
@@ -144,6 +148,17 @@ export class UbicacionService {
       const d = await this.calculaDistancia(this.currentLocation.lat, this.currentLocation.lng, lat, lng)
       resolve(d)
     })
+  }
+
+  // Navigate
+  async navigate(destino: number[]) {
+    const position = await this.getPosition()
+    let options: LaunchNavigatorOptions = {
+      start: [position.coords.latitude, position.coords.longitude],
+      app: this.launchNavigator.APP.WAZE
+    }
+
+    this.launchNavigator.navigate(destino, options)
   }
 
 

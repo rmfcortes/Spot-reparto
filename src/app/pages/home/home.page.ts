@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -22,7 +22,6 @@ import { Pedido, Cliente, Notificacion, Direccion } from 'src/app/interfaces/ped
 import { UnreadMsg } from 'src/app/interfaces/chat';
 
 
-
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
@@ -33,6 +32,7 @@ export class HomePage implements OnInit, OnDestroy{
   pedidos: Pedido[] = []
   nombre: string
 
+  back: Subscription
   msgSub: Subscription
   pedidosSub: Subscription
   permisosSub: Subscription
@@ -48,6 +48,7 @@ export class HomePage implements OnInit, OnDestroy{
 
   constructor(
     private router: Router,
+    private ngZone: NgZone,
     private callNumber: CallNumber,
     private modalCtrl: ModalController,
     private backgroundMode: BackgroundModeService,
@@ -71,8 +72,9 @@ export class HomePage implements OnInit, OnDestroy{
     this.reload = false
   }
 
-  init() {
+  async init() {
     this.nombre = this.uidService.getNombre()
+    await this.fcmService.initAudio()
     this.getPedidos()
     this.listenPermisos()
     this.isAsociado()
@@ -86,7 +88,6 @@ export class HomePage implements OnInit, OnDestroy{
       this.esAsociado = true
       this.backgroundMode.setAsociado(true)
       this.fcmService.requestToken()
-      this.fcmService.initAudio()
       this.listenPedidosNuevos()
     })
   }
@@ -103,39 +104,53 @@ export class HomePage implements OnInit, OnDestroy{
 
   getPedidos() {
     this.pedidosSub = this.pedidoService.getPedidos().subscribe((pedidos: Pedido[]) => {
-      this.pedidos = pedidos
-      if (this.pedidos && this.pedidos.length > 0) this.listenNewMsg()
-      else if (this.msgSub) this.msgSub.unsubscribe()
-    })
-  }
-
-  listenNewMsg() {
-    this.msgSub = this.chatService.listenMsg().subscribe((unReadmsg: UnreadMsg[]) => {
-      this.pedidos.forEach(p => {
-        const i = unReadmsg.findIndex(u => u.idPedido === p.id)
-        if (i >= 0) p.unRead = unReadmsg[i].cantidad
-        else p.unRead = 0
+      this.ngZone.run(() => {
+        this.pedidos = pedidos
+        if (this.pedidos && this.pedidos.length > 0) {
+          this.listenNewMsg()
+          this.backgroundMode.setPedidos(true)
+        }
+        else {
+          this.backgroundMode.setPedidos(false)
+          if (this.msgSub) this.msgSub.unsubscribe()
+        }
       })
     })
   }
 
   listenPedidosNuevos() { // if is Asociado Data
     this.pedidos_nuevosSub = this.fcmService.pedido_nuevo.subscribe(pedido => {
-      if (pedido) {
-        if (this.pedidos_nuevos.length === 0) {
-          this.pedidos_nuevos.push(pedido)
-        } else {
-          const i = this.pedidos_nuevos.findIndex(p => p.idPedido === pedido.idPedido)
-          if (i < 0) this.pedidos_nuevos.push(pedido)
+      this.ngZone.run(() => {
+        if (pedido) {
+          if (this.pedidos_nuevos.length === 0) {
+            this.pedidos_nuevos.push(pedido)
+          } else {
+            const i = this.pedidos_nuevos.findIndex(p => p.idPedido === pedido.idPedido)
+            if (i < 0) this.pedidos_nuevos.push(pedido)
+          }
+          if (!this.cuentaActiva) this.cuentaRegresiva()
         }
-        if (!this.cuentaActiva) this.cuentaRegresiva()
-      }
+      })
+    })
+  }
+
+  listenNewMsg() {
+    if (this.msgSub) this.msgSub.unsubscribe()
+    this.msgSub = this.chatService.listenMsg().subscribe((unReadmsg: UnreadMsg[]) => {
+      this.pedidos.forEach(p => {
+        this.ngZone.run(() => {
+          const i = unReadmsg.findIndex(u => u.idPedido === p.id)
+          if (i >= 0) p.unRead = unReadmsg[i].cantidad
+          else p.unRead = 0
+        })
+      })
     })
   }
 
   // Acciones
 
   toogleActive(value: boolean) {
+    console.log('Toogle active');
     this.activo = value
     if (this.pedidos.length > 0 && !value) {
       this.commonService.presentAlert('', 'Antes de pasar a Modo Inactivo, por favor completa todos tus servicios')
@@ -196,6 +211,11 @@ export class HomePage implements OnInit, OnDestroy{
   async verMapa(cliente: Cliente) {
     this.commonService.setClienteTemporal(cliente)
     this.router.navigate(['/mapa'])
+  }
+
+  navigate(lat: number, lng: number) {
+    const numbers = [lat, lng]
+    this.ubicacionService.navigate(numbers)
   }
 
   tomarServicio(pedido: Notificacion) { // solo para Asociados

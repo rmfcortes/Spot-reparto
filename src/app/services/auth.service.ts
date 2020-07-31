@@ -33,7 +33,7 @@ export class AuthService {
       if (user) return resolve(true)
       user = await this.revisaFireAuth()
       if (user) return resolve(true)
-      return resolve(false);
+      return resolve(false)
     });
   }
 

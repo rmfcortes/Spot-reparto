@@ -4,17 +4,22 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
+import { CallNumber } from '@ionic-native/call-number/ngx';
+
 import { PedidoPage } from './pedido.page';
 import { ConfirmarPagoPageModule } from '../confirmar-pago/confirmar-pago.module';
+import { ChatPageModule } from '../chat/chat.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    ChatPageModule,
     ConfirmarPagoPageModule,
   ],
   declarations: [PedidoPage],
-  entryComponents: [PedidoPage]
+  entryComponents: [PedidoPage],
+  providers: [CallNumber],
 })
 export class PedidoPageModule {}

@@ -5,6 +5,7 @@ import { RouteReuseStrategy } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { IonicStorageModule } from '@ionic/storage';
 
+import { LaunchNavigator } from '@ionic-native/launch-navigator/ngx';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
@@ -46,6 +47,7 @@ import { AppRoutingModule } from './app-routing.module';
     NativeAudio,
     Geolocation,
     BackgroundMode,
+    LaunchNavigator,
     LocationAccuracy,
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy }
   ],

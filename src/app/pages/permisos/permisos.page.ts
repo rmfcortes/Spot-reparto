@@ -25,9 +25,9 @@ export class PermisosPage implements OnInit {
 
   ngOnInit() {
     this.getToken()
-    this.isRemoteNotificationsEnabled()
     this.isLocationAuthorized()
     this.isGpsLocationEnabled()
+    this.isRemoteNotificationsEnabled()
   }
 
     // Check permissions
@@ -35,68 +35,48 @@ export class PermisosPage implements OnInit {
   getToken() {
     this.permissionService.getToken()
     .then(token => {
-      console.log('Token ' + token)
       this.fcmToken = token
       this.puedeRecibirPedidos()
     })
-    .catch(err => {
-      console.log(err)
-      this.fcmToken = false
-    })
+    .catch(() => this.fcmToken = false)
   }
 
   isRemoteNotificationsEnabled() {
     this.permissionService.isRemoteNotificationsEnabled()
     .then(resp => {
-      console.log('FCM ' + resp)
       this.fcmPermission = resp
       this.puedeRecibirPedidos()
     })
-    .catch(err => {
-      console.log(err)
-      this.fcmPermission = false
-    })
+    .catch(() => this.fcmPermission = false)
   }
 
   isLocationAuthorized() {
     this.permissionService.isLocationAuthorized()
     .then(resp => {
-      console.log('Location Auth ' + resp)
       this.gpsPermission = resp
       this.puedeRecibirPedidos()
     })
-    .catch(err => {
-      console.log(err)
-      this.gpsPermission = false
-    })
+    .catch(() => this.gpsPermission = false)
   }
 
   isGpsLocationEnabled() {
     this.permissionService.isGpsLocationEnabled()
     .then(resp => {
-      console.log('GPS on ' + resp)
       this.gpsActivated = resp
       this.puedeRecibirPedidos()
     })
-    .catch(err => {
-      console.log(err)
-      this.gpsActivated = false
-    })
+    .catch(() => this.gpsActivated = false)
   }
 
   // Request 
 
   async activaFCM()  {
     this.fcmService.requestToken()
-    .then(() => {
-      this.ngZone.run(() => {
-        this.fcmToken = true
-      })
-    })
-    .catch((error) => {
-      console.log(error);
-      this.fcmToken = false
-    })
+    .then(() => this.ngZone.run(() => {
+      this.fcmToken = true
+      this.puedeRecibirPedidos()
+    }))
+    .catch(() => this.fcmToken = false)
   }
 
   requestLocationAuthorization() {
@@ -120,7 +100,6 @@ export class PermisosPage implements OnInit {
   puedeRecibirPedidos() {
     if (this.fcmPermission && this.gpsPermission && this.gpsActivated && this.fcmToken) {
       this.router.navigate(['/home'])
-
     }
   }
 

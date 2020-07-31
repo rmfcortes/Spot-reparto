@@ -22,8 +22,8 @@ export class ChatService {
   }
 
   setSeen(idPedido) {
-    const idRepartidor = this.uidService.getUid();
-    this.db.object(`chat/${idRepartidor}/unread/${idPedido}`).remove();
+    const idRepartidor = this.uidService.getUid()
+    this.db.object(`chat/${idRepartidor}/unread/${idPedido}`).remove()
   }
 
   newMsg(idPedido) {
@@ -32,19 +32,19 @@ export class ChatService {
   }
 
   listenStatus(idPedido) {
-    const idRepartidor = this.uidService.getUid();
-    return this.db.object(`chat/${idRepartidor}/status/${idPedido}`).valueChanges();
+    const idRepartidor = this.uidService.getUid()
+    return this.db.object(`chat/${idRepartidor}/status/${idPedido}`).valueChanges()
   }
 
   listenUnread(idPedido) {
-    const idRepartidor = this.uidService.getUid();
-    return this.db.object(`chat/${idRepartidor}/unread/${idPedido}`).valueChanges();
+    const idRepartidor = this.uidService.getUid()
+    return this.db.object(`chat/${idRepartidor}/unread/${idPedido}`).valueChanges()
   }
 
   publicarMsg(idPedido: string, msg: Mensaje) {
-    const idRepartidor = this.uidService.getUid();
-    this.db.object(`chat/${idRepartidor}/status/${idPedido}`).remove();
-    this.db.list(`chat/${idRepartidor}/todos/${idPedido}`).push(msg);
+    const idRepartidor = this.uidService.getUid()
+    this.db.object(`chat/${idRepartidor}/status/${idPedido}`).remove()
+    this.db.list(`chat/${idRepartidor}/todos/${idPedido}`).push(msg)
   }
 
 }
