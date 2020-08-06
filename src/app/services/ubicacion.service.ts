@@ -10,7 +10,6 @@ import { CommonService } from './common.service';
 import { UidService } from './uid.service';
 
 import { Ubicacion } from '../interfaces/repa_asociado.interface';
-import { AlertService } from './alert.service';
 
 
 @Injectable({
@@ -46,7 +45,6 @@ export class UbicacionService {
     public geolocation: Geolocation,
     private launchNavigator: LaunchNavigator,
     private commonService: CommonService,
-    private alertService: AlertService,
     private uidService: UidService,
   ) { }
 

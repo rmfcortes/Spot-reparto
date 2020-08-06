@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { Mensaje, UnreadMsg } from 'src/app/interfaces/chat';
 import { ChatService } from 'src/app/services/chat.service';
 import { UidService } from 'src/app/services/uid.service';
+import { NetworkService } from 'src/app/services/network.service';
 
 @Component({
   selector: 'app-chat',
@@ -23,6 +24,8 @@ export class ChatPage implements OnInit {
   newMsg = ''
   status = ''
 
+  hasNet = true
+
   unReadSub: Subscription
   stateSub: Subscription
   back: Subscription
@@ -31,6 +34,7 @@ export class ChatPage implements OnInit {
     private ngZone: NgZone,
     private platform: Platform,
     private modalCtrl: ModalController,
+    private netService: NetworkService,
     private chatService: ChatService,
     private uidService: UidService,
   ) { }
@@ -39,6 +43,7 @@ export class ChatPage implements OnInit {
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       this.regresar()
     })
+    this.netService.isConnected.subscribe(value => this.hasNet = value)
   }
   
   ionViewWillEnter() {
@@ -59,22 +64,24 @@ export class ChatPage implements OnInit {
   }
 
   setSeen() {
+    if (!this.hasNet) return
     this.chatService.setSeen(this.idPedido)
   }
 
   listenUnread() {
     this.unReadSub = this.chatService.listenUnread(this.idPedido).subscribe((mensajes: UnreadMsg) => {
-        if (mensajes && mensajes.cantidad > 0) this.setSeen()
+        this.ngZone.run(() => mensajes && mensajes.cantidad > 0 ? this.setSeen() : null)
     })
   }
 
   listenState() {
     this.stateSub = this.chatService.listenStatus(this.idPedido).subscribe((estado: any) => {
-      this.status = estado || null
+      this.ngZone.run(() => estado ? this.status = estado : this.status = null) 
     })
   }
 
   sendMessage() {
+    if (!this.hasNet) return
     const newMsg: Mensaje = {
       isMe: false,
       createdAt: new Date().getTime(),

@@ -18,10 +18,7 @@ export class LoginPage implements OnInit {
   correo: string
   pass: string
 
-  isConnected = true
-
   back: Subscription
-  netSub: Subscription
 
   err: string
   form: FormGroup
@@ -37,11 +34,11 @@ export class LoginPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.netService.checkNetStatus()
     this.setForm()
   }
 
   ionViewWillEnter() {
-    this.netSub = this.netService.isConnected.subscribe(res => this.isConnected = res)
     this.back = this.platform.backButton.subscribeWithPriority(9999, () => {
       const nombre = 'app'
       navigator[nombre].exitApp()
@@ -103,7 +100,6 @@ export class LoginPage implements OnInit {
   }
 
   ionViewWillLeave() {
-    if (this.netSub) this.netSub.unsubscribe()
     if (this.back) this.back.unsubscribe()
   }
 

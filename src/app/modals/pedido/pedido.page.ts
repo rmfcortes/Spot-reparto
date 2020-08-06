@@ -15,6 +15,7 @@ import { PedidoService } from 'src/app/services/pedido.service';
 import { AlertService } from 'src/app/services/alert.service';
 
 import { Pedido, Cliente } from 'src/app/interfaces/pedido';
+import { NetworkService } from 'src/app/services/network.service';
 
 @Component({
   selector: 'app-pedido',
@@ -29,6 +30,8 @@ export class PedidoPage implements OnInit, AfterViewInit {
   msgSub: Subscription
   prodsReady = false
 
+  hasNet = true
+
   constructor(
     private router: Router,
     private callNumber: CallNumber,
@@ -37,10 +40,12 @@ export class PedidoPage implements OnInit, AfterViewInit {
     private ubicacionService: UbicacionService,
     private commonService: CommonService,
     private pedidoService: PedidoService,
+    private netService: NetworkService,
     private alertService: AlertService,
   ) { }
 
   ngOnInit() {
+    this.netService.isConnected.subscribe(value => this.hasNet = value)
   }
 
   ngAfterViewInit() {
@@ -97,7 +102,6 @@ export class PedidoPage implements OnInit, AfterViewInit {
   readyToLeave() {
     this.prodsReady = true
     this.pedido.productos.forEach(p => p.checked ? null : this.prodsReady = false)
-    console.log(this.prodsReady);
   }
 
   recolectar() {
@@ -114,6 +118,7 @@ export class PedidoPage implements OnInit, AfterViewInit {
   }
 
   async verMapa(cliente: Cliente) {
+    this.commonService.setPedidoTemporal(this.pedido)
     this.commonService.setClienteTemporal(cliente)
     this.router.navigate(['/mapa'])
     this.modalCtrl.dismiss()

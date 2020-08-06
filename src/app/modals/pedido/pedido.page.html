@@ -11,38 +11,15 @@
 <ion-content>
     <!-- Datos restaurante -->
     <ion-card *ngIf="esAsociado && pedido">
-        <ion-item lines="full">
-            <h2>Recoger en: {{pedido.negocio.nombreNegocio}}</h2>
-        </ion-item>
-        <ion-item lines="none">
-            <ion-label class="ion-text-wrap">{{pedido.negocio.direccion.direccion}}</ion-label>
-            <ion-icon slot="end" color="primary" name="map" *ngIf="!pedido.repartidor_llego" (click)="verMapa(pedido.negocio)"></ion-icon>
-            <ion-icon slot="end" color="primary" name="navigate" *ngIf="!pedido.repartidor_llego" (click)="navigate(pedido.negocio.direccion.lat, pedido.negocio.direccion.lng)"></ion-icon>
-        </ion-item>        
-        <ion-item lines="none" (click)="llamar(pedido.negocio.telefono)">
-            <ion-label class="ion-text-wrap">{{pedido.negocio.telefono}}</ion-label>
-            <ion-icon slot="end" color="primary" name="call"></ion-icon>
-        </ion-item>
-        <ion-item lines="full" *ngIf="!pedido.recolectado">
-            <h5 style="font-weight: 700;">Entregar a: {{pedido.cliente.nombre}}</h5>
-            <ng-container *ngIf="pedido.unRead > 0; else chatTemplate">
-                <ion-button fill="clear" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end">
-                    <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
-                    <ion-badge [class.badge-one]="pedido.unRead < 10" [class.badge-two]="pedido.unRead >= 10" color="dark">{{ pedido.unRead }}</ion-badge>
-                </ion-button>
-            </ng-container>
-            <ng-template #chatTemplate>
-                <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end"></ion-icon>
-            </ng-template>
-            <ion-icon (click)="llamar(pedido.cliente.telefono)" slot="end" name="call" *ngIf="pedido.cliente.telefono"></ion-icon>
-        </ion-item>  
-        <div class="caja_boton" id="caja_llegue" *ngIf="!pedido.repartidor_llego">
+        <app-card-negocio [item]="pedido" (call)="llamar($event)" (chat)="verChat($event.idCliente, $event.idPedido, $event.nombreCliente)" (map)="verMapa($event)" [inPedido]></app-card-negocio>
+        <div class="caja_boton" id="caja_llegue" *ngIf="!pedido.repartidor_llego" [style.visibility]="hasNet ? 'visible' : 'hidden'">
             <div class="text_entregar">
                 LLEGUÉ AL PUNTO 1
                 <ion-icon name="play-forward" color="primary"></ion-icon>
             </div>
             <div class="boton" id="llegue_btn"></div>
         </div>
+        <div *ngIf="!hasNet" style="text-align: center; color: red;" class="ion-text-wrap">Por favor revisa tu conexión a internet</div>
     </ion-card>
     <!-- Lista productos -->
     <ion-card *ngIf="!esAsociado && pedido || pedido.repartidor_llego && pedido">
@@ -64,38 +41,19 @@
             </ion-label>
             <ion-checkbox slot="end" color="primary" [(ngModel)]="producto.checked" (ionChange)="readyToLeave()" *ngIf="!pedido.recolectado"></ion-checkbox>
         </ion-item>
-        <div class="caja_boton" id="caja_recoleccion" *ngIf="!pedido.recolectado && esAsociado">
+        <div class="caja_boton" id="caja_recoleccion" *ngIf="!pedido.recolectado && esAsociado" [style.visibility]="hasNet ? 'visible' : 'hidden'">
             <div class="text_entregar">
                 TENGO LOS PRODUCTOS >>>
             </div>
             <div class="boton" id="recoleccion_btn">
             </div>
         </div>
+        <div *ngIf="!hasNet" style="text-align: center; color: red;" class="ion-text-wrap">Por favor revisa tu conexión a internet</div>
     </ion-card>
     <!-- Detalles entrega -->
     <ion-card *ngIf="pedido.recolectado && pedido || !esAsociado && pedido">
-        <ion-item lines="full">
-            <h2>Entregar a: {{pedido.cliente.nombre}}</h2>
-            <ng-container *ngIf="pedido.unRead > 0; else chatTemplate" shape="round">
-                <ion-button fill="clear" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end">
-                    <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
-                    <ion-badge [class.badge-one]="pedido.unRead < 10" [class.badge-two]="pedido.unRead >= 10" color="dark">{{ pedido.unRead }}</ion-badge>
-                </ion-button>
-            </ng-container>
-            <ng-template #chatTemplate>
-                <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(pedido.cliente.uid, pedido.id, pedido.cliente.nombre)" slot="end"></ion-icon>
-            </ng-template>
-        </ion-item>
-        <ion-item lines="none">
-            <ion-label class="ion-text-wrap">{{pedido.cliente.direccion.direccion}}</ion-label>
-            <ion-icon slot="end" color="primary" name="map" (click)="verMapa(pedido.cliente)"></ion-icon>
-            <ion-icon slot="end" color="primary" name="navigate" (click)="navigate(pedido.cliente.direccion.lat, pedido.cliente.direccion.lng)"></ion-icon>
-        </ion-item>        
-        <ion-item lines="none" (click)="llamar(pedido.cliente.telefono)" *ngIf="pedido.cliente.telefono">
-            <ion-label class="ion-text-wrap">{{pedido.cliente.telefono}}</ion-label>
-            <ion-icon slot="end" color="primary" name="call"></ion-icon>
-        </ion-item>
-        <div *ngIf="pedido.recolectado || !esAsociado">
+        <app-card-cliente [item]="pedido" (call)="llamar($event)" (chat)="verChat($event.idCliente, $event.idPedido, $event.nombreCliente)" (map)="verMapa($event)" [inPedido]="true"></app-card-cliente>
+        <div *ngIf="pedido.recolectado || !esAsociado" [style.visibility]="hasNet ? 'visible' : 'hidden'">
             <div style="width: 100%; text-align: center;">
                 <h1 style="font-weight: 700; color: black;" id="cuenta" *ngIf="pedido.formaPago.forma === 'efectivo'">Pago en efectivo: {{pedido.total | currency:'CAD':'symbol-narrow':'1.0-2'}}</h1>
             </div>
@@ -107,5 +65,8 @@
                 </div>
             </div>
         </div>
+        <div *ngIf="!hasNet" style="text-align: center; color: red;" class="ion-text-wrap">Por favor revisa tu conexión a internet</div>
     </ion-card>
 </ion-content>
+
+<app-no-network></app-no-network>

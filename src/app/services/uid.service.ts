@@ -17,7 +17,7 @@ export class UidService {
   constructor() {  }
 
   setUid(uid) {
-    this.uid = uid;
+    this.uid = uid
     this.usuario.next(uid)
   }
 

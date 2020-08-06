@@ -1,0 +1,34 @@
+<h2>Recoger en: {{item.negocio.nombreNegocio}}</h2>
+<ion-item lines="none" (click)="verMapa(item.negocio)" detail>
+    <ion-label class="ion-text-wrap">{{item.negocio.direccion.direccion}}</ion-label>
+    <ion-icon slot="start" name="map"></ion-icon>
+</ion-item>        
+<ion-item lines="none" (click)="llamar(item.negocio.telefono)" detail>
+    <ion-label class="ion-text-wrap">{{item.negocio.telefono}}</ion-label>
+    <ion-icon slot="start" name="call"></ion-icon>
+</ion-item>
+<ion-item lines="none">
+    <h5 style="font-weight: 700;">Entregar a: {{item.cliente.nombre}}</h5>
+</ion-item>    
+<ion-item *ngIf="item.cliente.telefono" detail lines="none">
+    <ion-label>{{item.cliente.telefono}}</ion-label>
+    <ion-icon (click)="llamar(item.cliente.telefono)" slot="start" name="call"></ion-icon>
+</ion-item>
+<ion-item detail lines="full">
+    <ion-label>Chat con cliente</ion-label>
+    <ng-container *ngIf="item.unRead > 0; else chatTemplate">
+        <ion-button fill="clear" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="start">
+            <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
+            <ion-badge [class.badge-one]="item.unRead < 10" [class.badge-two]="item.unRead >= 10" color="dark">{{ item.unRead }}</ion-badge>
+        </ion-button>
+    </ng-container>
+    <ng-template #chatTemplate>
+        <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="start"></ion-icon>
+    </ng-template>
+</ion-item>
+<ion-item style="margin-top: 0.5rem;" *ngIf="!inPedido">
+    <ion-label color="primary" style="font-weight: 700;">Gana: {{item.envio  + item.propina | currency:'CAD':'symbol-narrow':'1.0-2' }}</ion-label>
+    <ion-button (click)="verPedido(item)" slot="end" class="gradient--">
+        Detalles pedido
+    </ion-button>                    
+</ion-item>

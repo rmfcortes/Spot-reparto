@@ -56,6 +56,11 @@ export class PedidoService {
     this.db.object(`pendientes_aceptacion/${idRepartidor}/${pedido.idPedido}`).set(pedido)
   }
 
+  listenRespuesta(idPedido: string) {
+    const uid = this.uidService.getUid()
+    return this.db.object(`notifications/${uid}/${idPedido}`).query.ref
+  }
+
   async llegue(pedido: Pedido) {
     const idRepartidor = this.uidService.getUid()
     pedido.avances.push({
@@ -88,5 +93,6 @@ export class PedidoService {
     const uid = this.uidService.getUid()
     this.db.object(`repartidores_asociados_info/${region}/preview/${uid}/activo`).set(value)
   }
+
 
 }

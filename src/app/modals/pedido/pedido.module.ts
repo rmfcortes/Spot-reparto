@@ -9,13 +9,17 @@ import { CallNumber } from '@ionic-native/call-number/ngx';
 import { PedidoPage } from './pedido.page';
 import { ConfirmarPagoPageModule } from '../confirmar-pago/confirmar-pago.module';
 import { ChatPageModule } from '../chat/chat.module';
+import { NetworkModule } from 'src/app/shared/no-network.module';
+import { ClienteCardModule } from 'src/app/shared/cliente-card.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    NetworkModule,
     ChatPageModule,
+    ClienteCardModule,
     ConfirmarPagoPageModule,
   ],
   declarations: [PedidoPage],

@@ -1,0 +1,29 @@
+<ion-item>
+  <h2>Entregar a: {{item.cliente.nombre}}</h2>
+</ion-item>
+<ion-item lines="none" (click)="verMapa()" detail>
+  <ion-icon slot="start" name="map"></ion-icon>
+  <ion-label class="ion-text-wrap">{{item.cliente.direccion.direccion}}</ion-label>
+</ion-item>        
+<ion-item lines="none" (click)="llamar()" *ngIf="item.cliente.telefono" detail>
+  <ion-icon slot="start" name="call"></ion-icon>
+  <ion-label class="ion-text-wrap">{{item.cliente.telefono}}</ion-label>
+</ion-item>
+<ion-item lines="full" detail (click)="verChat()">
+  <ng-container *ngIf="item.unRead > 0; else chatTemplate" shape="round">
+      <ion-button fill="clear" slot="start">
+          <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
+          <ion-badge [class.badge-one]="item.unRead < 10" [class.badge-two]="item.unRead >= 10" color="dark">{{ item.unRead }}</ion-badge>
+      </ion-button>
+  </ng-container>
+  <ng-template #chatTemplate>
+      <ion-icon style="font-size: large;" name="chatbubble" slot="start"></ion-icon>
+  </ng-template>
+  <ion-label>Chat con cliente</ion-label>
+</ion-item>
+<ion-item lines="none" style="margin-top: 0.5rem;" *ngIf="!inPedido">
+  <ion-label color="primary" style="font-weight: 700;">Gana: {{item.envio  + item.propina | currency:'CAD':'symbol-narrow':'1.0-2' }}</ion-label>
+  <ion-button slot="end" (click)="verPedido()" class="gradient--">
+      Detalles pedido
+  </ion-button>
+</ion-item>

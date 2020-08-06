@@ -17,11 +17,22 @@
 </ion-header>
 
 <ion-content>
+
+    <!-- Refresher -->
+    <ion-refresher slot="fixed" pullFactor="0.5" pullMin = "100" pullMax = "200" (ionRefresh)="init($event)" class="fondo-content">
+        <ion-refresher-content
+          pullingIcon="chevron-down-circle-outline"
+          pullingText="Arrastra para actualizar pedidos"
+          refreshingSpinner="circles"
+          refreshingText="Actualizando...">
+        </ion-refresher-content>
+      </ion-refresher>
+
     <!-- Pedidos nuevos -->
     <ion-card *ngFor="let item of pedidos_nuevos; let i = index">
         <ion-item lines="full">
             <h2>Recoger en: {{item.negocio}}</h2>
-            <ion-badge slot="end" class="gradient--" mode="ios" style="margin-right: 1rem;">00:{{item.segundos_left | number:'1.0-0'}}</ion-badge>
+            <ion-badge slot="end" class="gradient--" mode="ios" style="margin-right: 1rem;" *ngIf="item.solicitudes < 3">00:{{item.segundos_left | number:'1.0-0'}}</ion-badge>
         </ion-item>
         <ion-item lines="none" (click)="verMapaNuevoPedido(i)">
             <ion-label class="ion-text-wrap">{{item.negocio_direccion}}</ion-label>
@@ -32,9 +43,16 @@
                 <h2 style="font-weight: 700; color: black;">A: {{item.distancia / 1000 | number:'1.0-2'}}kms</h2>
             </div>
         </ion-item>
-        <ion-button (click)="tomarServicio(item)" expand="block" shape="round" class="boton-margen gradient--" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
-            Tomar pedido. Gana {{item.ganancia + item.propina | currency:'CAD':'symbol-narrow':'1.0-2'}}
-        </ion-button>        
+        <ng-container *ngIf="!item.solicitado; else solTemp">            
+            <ion-button (click)="tomarServicio(item)" expand="block" shape="round" class="boton-margen gradient--" style="margin-top: 0.75rem; margin-bottom: 0.75rem;">
+                Tomar pedido. Gana {{item.ganancia + item.propina | currency:'CAD':'symbol-narrow':'1.0-2'}}
+            </ion-button>                    
+        </ng-container>
+        <ng-template #solTemp>
+            <ion-item lines="none" style="text-align: center;">
+                <ion-spinner name="dots" color="primary" style="font-size: large; margin: auto"></ion-spinner>
+            </ion-item>
+        </ng-template>
     </ion-card>
 
     <!-- Pedidos en curso-->
@@ -43,96 +61,18 @@
         <ion-card *ngFor="let item of pedidos">
             <!-- Camino a la tienda -->
             <ng-container *ngIf="!item.recolectado; else recolectadoTemp">
-                <h2>Recoger en: {{item.negocio.nombreNegocio}}</h2>
-                <ion-item lines="none">
-                    <ion-label class="ion-text-wrap">{{item.negocio.direccion.direccion}}</ion-label>
-                    <ion-icon slot="end" color="primary" name="map" (click)="verMapa(item.negocio)"></ion-icon>
-                    <ion-icon slot="end" color="primary" name="navigate" (click)="navigate(item.negocio.direccion.lat, item.negocio.direccion.lng)"></ion-icon>
-                </ion-item>        
-                <ion-item lines="none" (click)="llamar(item.negocio.telefono)">
-                    <ion-label class="ion-text-wrap">{{item.negocio.telefono}}</ion-label>
-                    <ion-icon slot="end" color="primary" name="call"></ion-icon>
-                </ion-item>
-                <ion-item lines="full">
-                    <h5 style="font-weight: 700;">Entregar a: {{item.cliente.nombre}}</h5>
-                    <ng-container *ngIf="item.unRead > 0; else chatTemplate">
-                        <ion-button fill="clear" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end">
-                            <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
-                            <ion-badge [class.badge-one]="item.unRead < 10" [class.badge-two]="item.unRead >= 10" color="dark">{{ item.unRead }}</ion-badge>
-                        </ion-button>
-                    </ng-container>
-                    <ng-template #chatTemplate>
-                        <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end"></ion-icon>
-                    </ng-template>
-                    <ion-icon (click)="llamar(item.cliente.telefono)" slot="end" name="call" *ngIf="item.cliente.telefono"></ion-icon>
-                </ion-item>    
-                <ion-item style="margin-top: 0.5rem;">
-                    <ion-label color="primary" style="font-weight: 700;">Gana: {{item.envio  + item.propina | currency:'CAD':'symbol-narrow':'1.0-2' }}</ion-label>
-                    <ion-button (click)="verPedido(item)" slot="end" class="gradient--">
-                        Detalles pedido
-                    </ion-button>                    
-                </ion-item>
+                <app-card-negocio [item]="item" (call)="llamar($event)" (chat)="verChat($event.idCliente, $event.idPedido, $event.nombreCliente)" (map)="verMapa($event)" (pedido)="verPedido($event)"></app-card-negocio>
             </ng-container>
                 <!-- Camino al Cliente -->
             <ng-template #recolectadoTemp>
-                <ion-item lines="full">
-                    <h2>Entregar a: {{item.cliente.nombre}}</h2>
-                    <ng-container *ngIf="item.unRead > 0; else chatTemplate" shape="round">
-                        <ion-button fill="clear" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end">
-                            <ion-icon style="font-size: large;" name="chatbubble"></ion-icon>
-                            <ion-badge [class.badge-one]="item.unRead < 10" [class.badge-two]="item.unRead >= 10" color="dark">{{ item.unRead }}</ion-badge>
-                        </ion-button>
-                    </ng-container>
-                    <ng-template #chatTemplate>
-                        <ion-icon style="font-size: large;" name="chatbubble" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" slot="end"></ion-icon>
-                    </ng-template>
-                </ion-item>
-                <ion-item lines="none">
-                    <ion-label class="ion-text-wrap">{{item.cliente.direccion.direccion}}</ion-label>
-                    <ion-icon slot="end" color="primary" name="map" (click)="verMapa(item.cliente)"></ion-icon>
-                    <ion-icon slot="end" color="primary" name="navigate" (click)="navigate(item.cliente.direccion.lat, item.cliente.direccion.lng)"></ion-icon>
-                </ion-item>        
-                <ion-item lines="full" (click)="llamar(item.cliente.telefono)" *ngIf="item.cliente.telefono">
-                    <ion-label class="ion-text-wrap">{{item.cliente.telefono}}</ion-label>
-                    <ion-icon slot="end" color="primary" name="call"></ion-icon>
-                </ion-item>
-                <ion-item lines="none" style="margin-top: 0.5rem;">
-                    <ion-label color="primary" style="font-weight: 700;">Gana: {{item.envio  + item.propina | currency:'CAD':'symbol-narrow':'1.0-2' }}</ion-label>
-                    <ion-button slot="end" (click)="verPedido(item)" class="gradient--">
-                        Detalles pedido
-                    </ion-button>
-                </ion-item>
+                <app-card-cliente [item]="item" (call)="llamar($event)" (chat)="verChat($event.idCliente, $event.idPedido, $event.nombreCliente)" (map)="verMapa($event)" (pedido)="verPedido($event)"></app-card-cliente>
             </ng-template>
-        
         </ion-card>
     </ng-container>
     <!-- Repartidores propios -->
     <ng-template #asocTemp>        
         <ion-card *ngFor="let item of pedidos">
-            <ion-list-header>
-                <ion-label color="primary">{{item.cliente.nombre}}</ion-label>
-            </ion-list-header>
-            <ion-item lines="none" detail (click)="verPedido(item)">
-                <ion-label class="ion-text-wrap" color="medium">{{item.cliente.direccion.direccion}}</ion-label>
-            </ion-item>
-            <ion-item>
-                <ion-button slot="start" (click)="verMapa(item.cliente)" fill="clear">
-                    Ver mapa
-                </ion-button>
-                <ion-button *ngIf="item.cliente.telefono" slot="end" fill="outline" (click)="llamar(item.cliente.telefono)" fill="clear">
-                    Llamar
-                </ion-button>
-                <ng-container *ngIf="item.unRead > 0; else chatTemplate" shape="round">
-                    <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)">
-                        Chat {{item.unRead}}
-                    </ion-button>
-                </ng-container>
-                <ng-template #chatTemplate>
-                    <ion-button slot="end" (click)="verChat(item.cliente.uid, item.id, item.cliente.nombre)" shape="round">
-                        Chat
-                    </ion-button>
-                </ng-template>
-            </ion-item>
+            <app-card-cliente [item]="item" (call)="llamar($event)" (chat)="verChat($event.idCliente, $event.idPedido, $event.nombreCliente)" (map)="verMapa($event)" (pedido)="verPedido($event)"></app-card-cliente>
         </ion-card>
     </ng-template>
         
@@ -153,3 +93,5 @@
         </ion-button>
     </div>
 </ion-content>
+
+<app-no-network></app-no-network>

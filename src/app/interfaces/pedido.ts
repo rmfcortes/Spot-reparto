@@ -136,5 +136,29 @@ export interface Notificacion {
     segundos_left?: number; 
     region?: string;       
     ganancia: number;
-    propina: number;  
+    propina: number;
+    solicitudes: number;
+    solicitado?: boolean;
+}
+
+export interface NotificacionDB {
+    idPedido: string;
+    idNegocio: string;                                
+    negocio: string;                              
+    negocio_direccion: string;                         
+    negocio_lat: string;                               
+    negocio_lng: string;                               
+    cliente: string;         
+    cliente_direccion: string;                       
+    cliente_lat: string;                             
+    cliente_lng: string;
+    createdAt: string;
+    distancia: string;
+    notificado: string;
+    segundos_left?: string; 
+    region?: string;       
+    ganancia: string;
+    propina: string;
+    solicitudes: string;
+    solicitado?: boolean;
 }

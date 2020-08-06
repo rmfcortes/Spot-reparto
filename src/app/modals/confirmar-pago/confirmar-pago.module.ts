@@ -5,12 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { ConfirmarPagoPage } from './confirmar-pago.page';
+import { NetworkModule } from 'src/app/shared/no-network.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    NetworkModule,
   ],
   declarations: [ConfirmarPagoPage],
   entryComponents: [ConfirmarPagoPage]

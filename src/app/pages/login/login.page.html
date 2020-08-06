@@ -1,49 +1,35 @@
 <ion-content>
-    <ng-container *ngIf="isConnected; else netTemplate">
-        <form [formGroup]="form" (ngSubmit)="ingresarConCorreo()" class="mobile-box shadow">
-            <ion-item lines="none" style="text-align: center;">
-                <ion-img src="../../../assets/img/logo.png" style="width: 35%; margin-left: 32.5%;"></ion-img>
-            </ion-item>
-            <h1 style="color: var(--ion-color-primary); font-size: xx-large; font-weight: 700;">Bienvenido</h1>
-            <p style="margin-bottom: 4rem;">Plaza para repartidores</p>
-            <ion-item lines="none" class="input margin">
-                <ion-label position="floating" class="grey">Usuario</ion-label>
-                <ion-input (keyup.enter)="focus(a)" type="text" formControlName="email" class="form-control" required></ion-input>
-            </ion-item>
-            <ng-container *ngFor="let validation of validation_messages.email">
-                <div class="error-message" *ngIf="form.get('email').hasError(validation.type) && (form.get('email').dirty || form.get('email').touched)">
-                    {{ validation.message }}
-                </div>
-            </ng-container>
-            <ion-item lines="none" class="input margin">
-                <ion-label position="floating" class="grey">Contraseña</ion-label>
-                <ion-input (keyup.enter)="blur(a)" #a type="password" required formControlName="password"></ion-input>
-            </ion-item>
-            <ng-container *ngFor="let validation of validation_messages.password">
-                <div class="error-message" *ngIf="form.get('password').hasError(validation.type) && (form.get('password').dirty || form.get('password').touched)">
-                    {{ validation.message }}
-                </div>
-            </ng-container>
-            <div class="error-message ion-text-wrap" *ngIf="err">
-                {{ err }}
+    <form [formGroup]="form" (ngSubmit)="ingresarConCorreo()" class="mobile-box shadow">
+        <ion-item lines="none" style="text-align: center;">
+            <ion-img src="../../../assets/img/logo.png" style="width: 35%; margin-left: 32.5%;"></ion-img>
+        </ion-item>
+        <h1 style="color: var(--ion-color-primary); font-size: xx-large; font-weight: 700;">Bienvenido</h1>
+        <p style="margin-bottom: 4rem;">Plaza para repartidores</p>
+        <ion-item lines="none" class="input margin">
+            <ion-label position="floating" class="grey">Usuario</ion-label>
+            <ion-input (keyup.enter)="focus(a)" type="text" formControlName="email" class="form-control" required></ion-input>
+        </ion-item>
+        <ng-container *ngFor="let validation of validation_messages.email">
+            <div class="error-message" *ngIf="form.get('email').hasError(validation.type) && (form.get('email').dirty || form.get('email').touched)">
+                {{ validation.message }}
             </div>
-            <ion-button type="submit" shape="round" style="margin-top: 2rem;" class="gradient--">
-                Ingresar
-            </ion-button>
-        </form>
-    </ng-container>
-    <ng-template #netTemplate>
-        <ion-grid class="ion-padding" style="text-align: center;">
-            <ion-row>
-                <ion-col size="12">
-                    <ion-img src="../../../assets/img/no_wifi.jpg"></ion-img>
-                </ion-col>
-            </ion-row>
-            <ion-row>
-                <ion-col size="12">
-                    <ion-label color="medium">No tienes conexión a internet. Por revisa tu red.</ion-label>
-                </ion-col>
-            </ion-row>
-        </ion-grid>
-    </ng-template>
+        </ng-container>
+        <ion-item lines="none" class="input margin">
+            <ion-label position="floating" class="grey">Contraseña</ion-label>
+            <ion-input (keyup.enter)="blur(a)" #a type="password" required formControlName="password"></ion-input>
+        </ion-item>
+        <ng-container *ngFor="let validation of validation_messages.password">
+            <div class="error-message" *ngIf="form.get('password').hasError(validation.type) && (form.get('password').dirty || form.get('password').touched)">
+                {{ validation.message }}
+            </div>
+        </ng-container>
+        <div class="error-message ion-text-wrap" *ngIf="err">
+            {{ err }}
+        </div>
+        <ion-button type="submit" shape="round" style="margin-top: 2rem;" class="gradient--">
+            Ingresar
+        </ion-button>
+    </form>
 </ion-content>
+
+<app-no-network></app-no-network>

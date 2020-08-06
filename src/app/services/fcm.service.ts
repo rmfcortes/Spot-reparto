@@ -7,10 +7,9 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { AngularFireDatabase } from '@angular/fire/database';
 
 import { UbicacionService } from './ubicacion.service';
-import { CommonService } from './common.service';
 import { UidService } from './uid.service';
 
-import { Notificacion } from '../interfaces/pedido';
+import { Notificacion, NotificacionDB } from '../interfaces/pedido';
 
 
 @Injectable({
@@ -29,7 +28,6 @@ export class FcmService {
     private audio: NativeAudio,
     private db: AngularFireDatabase,
     private ubicacionService: UbicacionService,
-    private commonService: CommonService,
     private uidService: UidService,
   ) {  }
 
@@ -39,10 +37,6 @@ export class FcmService {
       this.audio.preloadSimple('mensaje', 'assets/sounds/mensaje.mp3')
       resolve()
     })
-  }
-
-  playMensaje() {
-    this.audio.play('mensaje')
   }
 
   requestToken() {
@@ -62,20 +56,20 @@ export class FcmService {
       .catch((error) => {
         reject(error)
       })
-    });
+    })
   }
 
   escuchaMensajes() {
     this.notifcationSub = this.fcm.onNotification().subscribe((msg: NotificationData) => {
       this.ngZone.run(() => {
-        if (msg.idPedido) this.newNotification(msg)
+        // if (msg.idPedido) this.newNotification(msg)
         this.fcm.clearAllNotifications()
-        this.commonService.presentToast(msg.body)
       })
     })
   }
 
-  async newNotification(notification) {
+  async newNotification(notification: NotificacionDB, inBackground: boolean) {
+    this.silenciar()
     const distancia = await this.ubicacionService.getDistancia(
       parseFloat(notification.negocio_lat),
       parseFloat(notification.negocio_lng)
@@ -95,20 +89,32 @@ export class FcmService {
       notificado: parseInt(notification.notificado, 10),
       ganancia: parseInt(notification.ganancia, 10),
       propina: parseInt(notification.propina, 10),
-      distancia
+      distancia,
+      solicitudes: parseInt(notification.solicitudes, 10)
     }
     this.pedido_nuevo.next(nuevo_pedido)
-    this.clearNotifications(nuevo_pedido.idPedido)
+    if (nuevo_pedido.solicitudes < 3) this.clearNotifications(nuevo_pedido.idPedido, nuevo_pedido.notificado)
+    if (inBackground) this.playAlert()
+    else this.playMensaje()
+  }
+
+  playAlert() {
     this.audio.play('alerta')
+  }
+
+  playMensaje() {
+    this.audio.play('mensaje')
   }
 
   cleanPedidoSub() {
     this.pedido_nuevo.next(null)
   }
 
-  clearNotifications(idPedido: string) {
+  clearNotifications(idPedido: string, notificado: number) {
+    const espera = this.uidService.getTolerancia()
+    const tolerancia = notificado + espera - 5000
     const uid = this.uidService.getUid()
-    this.db.object(`notifications/${uid}/${idPedido}`).remove()
+    setTimeout(() => this.db.object(`notifications/${uid}/${idPedido}`).remove(), tolerancia)
   }
 
   silenciar() {

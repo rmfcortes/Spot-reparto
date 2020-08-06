@@ -105,11 +105,12 @@ export class AuthService {
         this.uidService.setUid(null)
         this.uidService.setNombre(null)
         this.uidService.setRegion(null)
+        this.uidService.setAsociado(false)
         resolve()
       } catch (error) {
         reject(error)
       }
-    });
+    })
   }
 
 

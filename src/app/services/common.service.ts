@@ -6,7 +6,7 @@ import { AngularFireDatabase } from '@angular/fire/database';
 
 import { UidService } from './uid.service';
 
-import { Cliente } from '../interfaces/pedido';
+import { Cliente, Pedido } from '../interfaces/pedido';
 
 @Injectable({
   providedIn: 'root'
@@ -14,6 +14,7 @@ import { Cliente } from '../interfaces/pedido';
 export class CommonService {
 
   cliente: Cliente
+  pedido: Pedido
 
   constructor(
     private storage: Storage,
@@ -70,8 +71,15 @@ export class CommonService {
     else {
       this.cliente = JSON.parse( await this.getVariableFromStorage('cliente_temporal'))
       return this.cliente
-    }
-    
+    }  
+  }
+
+  setPedidoTemporal(pedido: Pedido) {
+    this.pedido = pedido
+  }
+
+  getPedidoTemporal(){
+    return this.pedido
   }
 
   setError(origen, error) {

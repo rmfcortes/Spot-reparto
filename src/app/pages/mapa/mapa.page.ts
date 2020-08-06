@@ -15,9 +15,9 @@ import { FcmService } from 'src/app/services/fcm.service';
 })
 export class MapaPage implements OnInit {
 
-  cliente: Cliente;
+  cliente: Cliente
 
-  map: GoogleMap;
+  map: GoogleMap
 
   repartidorMaker: Marker
   clienteLatLng: ILatLng
@@ -44,15 +44,16 @@ export class MapaPage implements OnInit {
       lat: this.cliente.direccion.lat,
       lng: this.cliente.direccion.lng
     }
-    setTimeout(() => {
-      this.loadMap()
-    }, 350)
+    this.loadMap()
+  }
+
+  navigate() {
+    const numbers = [this.cliente.direccion.lat, this.cliente.direccion.lng]
+    this.ubicacionService.navigate(numbers)
   }
 
   loadMap() {
-    if(this.map){
-      this.map.clear();
-    }
+    if(this.map) this.map.clear()
     
     // This code is necessary for browser
     Environment.setEnv({

@@ -9,14 +9,18 @@ import { CallNumber } from '@ionic-native/call-number/ngx';
 import { HomePage } from './home.page';
 import { PedidoPageModule } from 'src/app/modals/pedido/pedido.module';
 import { ChatPageModule } from 'src/app/modals/chat/chat.module';
+import { NetworkModule } from 'src/app/shared/no-network.module';
+import { ClienteCardModule } from 'src/app/shared/cliente-card.module';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
+    NetworkModule,
     ChatPageModule,
     PedidoPageModule,
+    ClienteCardModule,
     RouterModule.forChild([
       {
         path: '',
