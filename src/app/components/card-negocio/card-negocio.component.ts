@@ -23,8 +23,8 @@ export class CardNegocioComponent implements OnInit {
     this.map.emit(this.item.cliente)
   }
 
-  llamar() {
-    this.call.emit(this.item.cliente.telefono)
+  llamar(telefono: string) {
+    this.call.emit(telefono)
   }
 
   verChat() {

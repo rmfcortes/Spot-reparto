@@ -1,12 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
-import { GoogleMap, Marker, ILatLng, Environment, GoogleMapOptions, GoogleMaps, MarkerIcon } from '@ionic-native/google-maps/ngx';
-import { Cliente } from 'src/app/interfaces/pedido';
 import { Platform } from '@ionic/angular';
+import { GoogleMap, Marker, ILatLng, Environment, GoogleMapOptions, GoogleMaps, MarkerIcon } from '@ionic-native/google-maps/ngx';
+
 import { UbicacionService } from 'src/app/services/ubicacion.service';
-import { environment } from 'src/environments/environment';
 import { CommonService } from 'src/app/services/common.service';
 import { FcmService } from 'src/app/services/fcm.service';
+
+import { environment } from 'src/environments/environment';
+import { Cliente } from 'src/app/interfaces/pedido';
 
 @Component({
   selector: 'app-mapa',
